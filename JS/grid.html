@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Grid Practice</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: sans-serif;
+      background: #f0f0f0;
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      gap: 1rem;
+      padding: 1rem;
+      overflow: hidden;
+    }
+
+    .grid-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .grid-container {
+      display: grid;
+      gap: 15px;
+      transition: transform 0.3s ease;
+      transform-origin: center center;
+    }
+
+    .grid-item {
+      background-color: rgb(255, 227, 227);
+      color: transparent;
+      display: flex;
+      width: 18px;
+      height: 4px;
+      align-items: center;
+      justify-content: center;
+      aspect-ratio: 1 / 1;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    .controls input, .controls button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 4px;
+    }
+
+    .controls button {
+      background-color: #333;
+      color: white;
+      cursor: pointer;
+    }
+
+    .controls button:hover {
+      background-color: #555;
+    }
+
+    @media (max-width: 600px) {
+      .grid-item {
+        font-size: 0.8rem;
+      }
+
+      input, button {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.6rem;
+      }
+
+      .controls {
+        flex-direction: column;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="grid-wrapper">
+      <div id="grid" class="grid-container"></div>
+    </div>
+
+    <div class="controls">
+      <input type="number" id="inputItem" placeholder="How many?" />
+      <button onclick="addMultipleItems()">Add</button>
+      <button onclick="minusItem()">Minus</button>
+      <button onclick="clearGrid()">Clear</button>
+    </div>
+  </div>
+
+  <script>
+    let items = 0;
+    let allItems = []
+    
+    function addMultipleItems() {
+     items = 0;
+     clearGrid();
+     
+      const input = document.getElementById("inputItem");
+      const value = parseInt(input.value);
+      if (isNaN(value) || value < 1) return;
+
+      const grid = document.getElementById("grid");
+      for (let i = 0; i < value; i++) {
+        const div = document.createElement("div");
+        div.className = "grid-item";
+        div.textContent = ++items;
+        grid.appendChild(div);
+      }
+
+      updateGridLayout();
+      input.value = '';
+    }
+
+    function minusItem() {
+      const grid = document.getElementById("grid");
+      if (items > 0 && grid.lastChild) {
+        grid.removeChild(grid.lastChild);
+        items--;
+        updateGridLayout();
+      }
+    }
+
+    function clearGrid() {
+      const grid = document.getElementById("grid");
+      grid.innerHTML = '';
+      items = 0;
+      updateGridLayout();
+    }
+
+    function updateGridLayout() {
+   
+      const grid = document.getElementById("grid");
+      const size = Math.ceil(Math.sqrt(items));
+      grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+      grid.style.gridTemplateRows = `repeat(${size}, 1fr)`;
+
+      const isMobile = window.innerWidth <= 600;
+      const baseScale = isMobile ? 10 : 18;
+      const scaleFactor = Math.min(1, baseScale / size);
+      grid.style.transform = `scale(${scaleFactor})`;
+    }
+
+    document.getElementById("inputItem").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") addMultipleItems();
+    });
+  </script>
+</body>
+</html>

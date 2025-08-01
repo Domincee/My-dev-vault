@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive Rotating Grid</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* Hides scroll bar */
+      height: 100%;
+      background: #f0f0f0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(6, 100px);
+      grid-template-rows: repeat(6, 100px);
+      gap: 20px;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .cell {
+      width: 100px;
+      height: 100px;
+      position: relative;
+    }
+    .rect {
+      width: 60px;
+      height: 10px;
+      background-color: #444;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform-origin: center center;
+      transform: translate(-50%, -50%) rotate(0deg);
+      transition: transform 0.1s linear, background-color 0.2s ease;
+    }
+
+    .rect.hovered {
+  transform: translate(-50%, -50%) scale(1.5) rotate(var(--angle, 0deg));
+      cursor: pointer;
+  z-index: 200;
+    }
+  </style>
+</head>
+<body>
+
+<div class="grid" id="grid"></div>
+
+<button style="position: absolute; bottom: 5px ; left: 55%;" onclick="addItem()""> Add</button>
+
+<script>
+  const grid = document.getElementById('grid');
+
+  // Helper to generate HSL color
+  const getColor = (hOffset = 0) => {
+    const hue = Math.floor((Math.random() * 360 + hOffset) % 360);
+    return `hsl(${hue}, 70%, 60%)`;
+  };
+  
+  // Build grid
+  let items = 4;
+  const rects = [];
+
+  for (let i = 0; i < items; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+
+    const rect = document.createElement('div');
+    rect.className = 'rect';
+    rect.dataset.rotation = '0';
+    rect.dataset.turns = '0';
+    rect.dataset.index = i;
+
+    cell.appendChild(rect);
+    grid.appendChild(cell);
+    rects.push(rect);
+  }
+
+  let isScrolling = false;
+  let scrollTimeout;
+  let fakeScroll = 0;
+
+  // Scroll-based rotation
+  window.addEventListener('wheel', (e) => {
+    isScrolling = true;
+    clearTimeout(scrollTimeout);
+
+    const direction = e.deltaY > 0 ? 1 : -1;
+    fakeScroll += direction;
+
+    rects.forEach((rect) => {
+      let currentAngle = parseFloat(rect.dataset.rotation || '0');
+      currentAngle += direction * 60;
+
+      const prevFullTurns = Math.floor(currentAngle / 360);
+      const storedTurns = parseInt(rect.dataset.turns || '0');
+
+      if (prevFullTurns !== storedTurns) {
+        rect.style.backgroundColor = getColor();
+        rect.dataset.turns = prevFullTurns;
+      }
+
+      rect.style.transform = `translate(-50%, -50%) rotate(${currentAngle}deg)`;
+      rect.dataset.rotation = currentAngle.toFixed(2);
+    });
+
+    scrollTimeout = setTimeout(() => {
+      isScrolling = false;
+    }, 250);
+  });
+
+  // Mouse follow when not scrolling
+  document.addEventListener('mousemove', (e) => {
+    if (isScrolling) return;
+
+    rects.forEach((rect) => {
+      const box = rect.getBoundingClientRect();
+      const centerX = box.left + box.width / 2;
+      const centerY = box.top + box.height / 2;
+
+      const dx = e.clientX - centerX;
+      const dy = e.clientY - centerY;
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+      const prevFullTurns = Math.floor(angle / 360);
+      const storedTurns = parseInt(rect.dataset.turns || '0');
+
+      if (prevFullTurns !== storedTurns) {
+        rect.style.backgroundColor = getColor();
+        rect.dataset.turns = prevFullTurns;
+      }
+
+      rect.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+      rect.dataset.rotation = angle.toFixed(2);
+    });
+  });
+
+  // Hover effects
+rects.forEach((rect, index) => {
+
+    rect.dataset.hovered = 'true';
+  rect.addEventListener('mouseenter', () => {
+    // Generate a base hue and its opposite
+    const baseHue = Math.floor(Math.random() * 360);
+    const oppositeHue = (baseHue + 180) % 360;
+
+    const hoveredColor = `hsl(${baseHue}, 80%, 55%)`;
+    const othersColor = `hsl(${oppositeHue}, 60%, 50%)`;
+
+    rects.forEach((r, i) => {
+      r.style.backgroundColor = i === index ? hoveredColor : othersColor;
+    });
+  });
+
+  rect.addEventListener('mouseleave', () => {
+    // Restore default color
+    rects.forEach((r) => {
+      r.style.backgroundColor = '#444';
+    });
+  });
+});
+</script>
+
+</body>
+</html>
