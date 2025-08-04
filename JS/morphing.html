@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Responsive Word Dots</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #111;
+      font-family: sans-serif;
+      color: white;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+    h2 {
+      margin-top: 20px;
+      font-size: 1.5rem;
+    }
+
+    #textInput {
+      padding: 10px 14px;
+      font-size: 1rem;
+      width: 60%;
+      max-width: 300px;
+      border-radius: 5px;
+      border: none;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 10px 16px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      background: rgb(52, 68, 238);
+      color: #000;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+
+    #output {
+      position: relative;
+      width: 100%;
+      max-width: 220px;
+      height: 120px;
+      margin: 20px auto;
+    }
+
+    .dot {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background-color: #843dff;
+      border-radius: 50%;
+      transform: translate(0, 0);
+      transition: transform 1.2s ease;
+    }
+
+    canvas {
+      display: none;
+      
+    }
+
+    @media (max-width: 480px) {
+      h2 {
+        font-size: 1.2rem;
+      }
+
+      #textInput, button {
+        font-size: 0.9rem;
+      }
+
+      .dot {
+        width: 3px;
+        height: 3px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Type a Word</h2>
+  <input id="textInput" type="text" placeholder="Type here..." />
+  <button onclick="generateShapes()">Animate</button>
+
+  <canvas id="hiddenCanvas" width="320" height="120"></canvas>
+  <div id="output"></div>
+
+  <script>
+    function generateShapes() {
+      const word = document.getElementById("textInput").value.trim();
+      if (!word) return;
+
+      const canvas = document.getElementById("hiddenCanvas");
+      const ctx = canvas.getContext("2d");
+      const output = document.getElementById("output");
+
+      output.innerHTML = "";
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "white";
+      ctx.font = "bold 100px sans-serif";
+      ctx.textBaseline = "middle";
+      ctx.textAlign = "left";
+
+      // Auto-adjust font size based on word length
+      let fontSize = Math.min(50, 280 / word.length);
+      ctx.font = `bold ${fontSize}px sans-serif`;
+      ctx.fillText(word, 10, canvas.height / 2);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+
+      let maxDots = 0;
+      const dots = [];
+
+      for (let y = 0; y < canvas.height; y += 5 ) {
+        for (let x = 0; x < canvas.width; x += 5) {
+          const index = (y * canvas.width + x) * 4;
+          const alpha = data[index + 3];
+
+          if (alpha > 190) {
+            const dot = document.createElement("div");
+            dot.className = "dot";
+
+            const randX = (Math.random() - 0.5) * canvas.width;
+            const randY = (Math.random() - 0.5) * canvas.height;
+            dot.style.left = `${x}px`;
+            dot.style.top = `${y}px`;
+            dot.style.transform = `translate(${randX}px, ${randY}px)`;
+
+            output.appendChild(dot);
+            dots.push(dot);
+            maxDots++;
+          }
+        }
+      }
+
+      // Animate into place after delay
+      setTimeout(() => {
+        dots.forEach(dot => {
+          dot.style.transform = `translate(0px, 0px)`;
+        });
+      }, 50);
+    }
+  </script>
+
+</body>
+</html>

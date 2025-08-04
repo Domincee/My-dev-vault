@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pop it</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      font-family: sans-serif;
+      background-color: #f0f0f0;
+    }
+
+    .score-board {
+      font-size: 1.5rem;
+      margin: 10px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .wrapper {
+      height: 90%;
+      width: 90vw;
+      max-width: 500px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .grid {
+      display: grid;
+      border: 2px solid rgb(109, 0, 243);
+      height: 100%;
+      width: 100%;
+    }
+
+    .item {
+      position: relative;
+      border: 1px solid black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .circle {
+      position: absolute;
+      background-color: rgb(51, 0, 255);
+      width: 90%;
+      height: 70%;
+      border-radius: 100%;
+      transition: all 1s ease-in-out;
+      animation: pop 1.5s ease-in-out forwards;
+    }
+
+    .circle:hover {
+      background-color: rgb(81, 73, 244);
+      cursor: pointer;
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.2);
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(0);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .score-board {
+        font-size: 1.2rem;
+      }
+
+      .wrapper {
+        width: 100vw;
+        height: 85%;
+      }
+
+      .grid {
+        border-width: 1px;
+      }
+
+      .circle {
+        width: 80%;
+        height: 60%;
+      }
+    }
+    .level-container {
+  margin: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+.level-container button {
+  padding: 10px 15px;
+  border: none;
+  background-color: #4c00ff;
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.level-container button:hover {
+  background-color: #3700b3;
+}
+
+
+@media (max-width: 600px) {
+  .score-board {
+    font-size: 1.2rem;
+    margin-top: 10px;
+  }
+
+  .wrapper {
+    width: 95vw;
+    height: 75%;
+  }
+
+  .grid {
+    border-width: 1px;
+    gap: 4px;
+  }
+
+  .circle {
+    width: 80%;
+    height: 60%;
+  }
+
+  .level-container button {
+    font-size: 0.9rem;
+    padding: 8px 12px;
+  }
+}
+  </style>
+</head>
+<body>
+  <div class="score-board">Points: <span id="score">0</span></div>
+  <div class="wrapper">
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="level-container">
+    <button id="easy">Easy</button>
+    <button id="normal">Normal</button>
+    <button id="hard">Hard</button>
+    <button id="endless">Endless</button>
+
+  </div>
+
+  <script>
+    let items = 100;
+    let points = 0;
+    
+    
+    const grid = document.getElementById('grid');
+    const scoreDisplay = document.getElementById('score');
+
+    // Generate the grid items
+    for (let i = 0; i < items; i++) {
+      const item = document.createElement('div');
+      item.className = "item";
+      item.dataset.index = i;
+      grid.appendChild(item);
+    }
+
+    // Set grid layout size
+    const size = Math.ceil(Math.sqrt(items));
+    grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+    grid.style.gridTemplateRows = `repeat(${size}, 1fr)`;
+
+
+
+    let activeCircle = null;
+    let circleTimeout = null;
+
+    // Function to spawn a circle in a random item
+    function spawnCircle() {
+      // Clean up previous circle
+      if (activeCircle) {
+        activeCircle.remove();
+      }
+
+      const allItems = document.querySelectorAll('.item');
+      const randomIndex = Math.floor(Math.random() * allItems.length);
+      const targetItem = allItems[randomIndex];
+
+
+      let circlesCount = 1;
+      
+   
+      const circle = document.createElement('div');
+      const totalcircle = document.querySelectorAll('.circle').length;
+
+  
+      circle.className = "circle";
+      targetItem.appendChild(circle);
+      activeCircle = circle;
+
+      // Click to destroy early and spawn new one
+      circle.onclick = () => {
+        points++;
+        scoreDisplay.textContent = points;
+        clearTimeout(circleTimeout);
+        circle.remove();
+        targetItem.style.backgroundColor = "";
+        spawnCircle(); // Spawn new one immediately
+      };
+
+      // Auto-remove after 2 seconds and spawn new
+      circleTimeout = setTimeout(() => {
+        if (circle.parentElement) {
+          circle.remove();
+          targetItem.style.backgroundColor = "";
+          
+        }
+        
+        spawnCircle();
+         // Auto-respawn after timeout
+      }, 2000);
+    
+      }
+
+    // Start the loop
+    spawnCircle();
+
+  </script>
+</body>
+</html>
