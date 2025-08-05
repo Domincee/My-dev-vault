@@ -16,7 +16,6 @@
       flex-direction: column;
       align-items: center;
       height: 100vh;
-      overflow: hidden;
       font-family: sans-serif;
       background-color: #f0f0f0;
     }
@@ -38,30 +37,31 @@
     }
 
     .grid {
+      padding:10px;
       display: grid;
-      border: 2px solid rgb(109, 0, 243);
-      height: 100%;
-      width: 100%;
+      border: 1px solid rgb(109, 0, 243);
+      width: min(90vw, 90vh); 
+      aspect-ratio: 1/1;
+        margin: auto;   
     }
 
     .item {
       position: relative;
-      border: 1px solid black;
+      border: 1px solid rgb(109, 0, 243);
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
+ 
     .circle {
       position: absolute;
       background-color: rgb(51, 0, 255);
-      width: 90%;
-      height: 70%;
-      border-radius: 100%;
+      width: 80%;
+      aspect-ratio: 1 / 1; /* Ensures it's always a square */
+      border-radius: 50%; /* Makes it a circle */
       transition: all 1s ease-in-out;
-      animation: pop 1.5s ease-in-out forwards;
     }
-
     .circle:hover {
       background-color: rgb(81, 73, 244);
       cursor: pointer;
@@ -82,25 +82,7 @@
       }
     }
 
-    @media (max-width: 600px) {
-      .score-board {
-        font-size: 1.2rem;
-      }
 
-      .wrapper {
-        width: 100vw;
-        height: 85%;
-      }
-
-      .grid {
-        border-width: 1px;
-      }
-
-      .circle {
-        width: 80%;
-        height: 60%;
-      }
-    }
     .level-container {
   margin: 15px;
   display: flex;
@@ -130,8 +112,8 @@
   }
 
   .wrapper {
-    width: 95vw;
-    height: 75%;
+    width: 90%;
+    height: 80%;
   }
 
   .grid {
@@ -139,10 +121,7 @@
     gap: 4px;
   }
 
-  .circle {
-    width: 80%;
-    height: 60%;
-  }
+
 
   .level-container button {
     font-size: 0.9rem;
@@ -158,89 +137,124 @@
   </div>
 
   <div class="level-container">
-    <button id="easy">Easy</button>
-    <button id="normal">Normal</button>
-    <button id="hard">Hard</button>
-    <button id="endless">Endless</button>
+    <button class="level" id="easy">Easy</button>
+    <button class="level" id="normal">Normal</button>
+    <button class="level" id="hard">Hard</button>
+    <button class="level" id="endless">Endless</button>
 
   </div>
 
-  <script>
-    let items = 100;
-    let points = 0;
-    
-    
-    const grid = document.getElementById('grid');
-    const scoreDisplay = document.getElementById('score');
+ <script>
+ let items = 100;
+let points = 0;
 
-    // Generate the grid items
-    for (let i = 0; i < items; i++) {
-      const item = document.createElement('div');
-      item.className = "item";
-      item.dataset.index = i;
-      grid.appendChild(item);
-    }
+const grid = document.getElementById('grid');
+const scoreDisplay = document.getElementById('score');
 
-    // Set grid layout size
-    const size = Math.ceil(Math.sqrt(items));
-    grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
-    grid.style.gridTemplateRows = `repeat(${size}, 1fr)`;
+// Generate the grid items
+for (let i = 0; i < items; i++) {
+  const item = document.createElement('div');
+  item.className = "item";
+  grid.appendChild(item);
+}
+
+// Set grid layout size
+const size = Math.ceil(Math.sqrt(items));
+grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+grid.style.gridTemplateRows = `repeat(${size}, 1fr)`;
 
 
+let timer = 1.5;
+let redCircleCount = 0;
+let nextThreshold = 20; 
+let mutiplier = 1.5; 
 
-    let activeCircle = null;
-    let circleTimeout = null;
+const levels = [...document.querySelectorAll('.level')];
 
-    // Function to spawn a circle in a random item
-    function spawnCircle() {
-      // Clean up previous circle
-      if (activeCircle) {
-        activeCircle.remove();
-      }
+levels.forEach(level => {
 
-      const allItems = document.querySelectorAll('.item');
-      const randomIndex = Math.floor(Math.random() * allItems.length);
-      const targetItem = allItems[randomIndex];
+  level.addEventListener('click', () => {
+    levels.forEach(l => l.classList.remove('active'));
+    level.classList.add('active');
 
-
-      let circlesCount = 1;
-      
+    switch (level.id) {
    
+      case 'easy':
+        points = 0; 
+        redCircleCount = 1;
+        timer = 1.5;
+          grid.style.borderWidth = '1px';
+        break;
+      case 'normal':
+          points = 0; //
+        timer = 1.2;
+        redCircleCount = 2;
+        grid.style.borderWidth = '3px'; // Reset border width
+        break;
+      case 'hard':
+          points = 0; //
+        timer = 0.8;
+        redCircleCount = 3;
+         // Reset red circle count
+          grid.style.borderWidth = '5px';
+        break;
+
+      case 'endless':
+          points = 0;
+        timer = 0.5;
+            grid.style.borderWidth = '7px';
+        break;
+    }
+    scoreDisplay.textContent = points; // Reset score display
+  });
+});
+
+function updateScore() {
+
+  scoreDisplay.textContent = points;
+} 
+
+
+
+function spawnCircle(count = 3) {
+  console.log(`Spawning ${count} circles every ${timer} seconds`);
+  const allItems = [...document.querySelectorAll('.item')];
+  const shuffledItems = allItems.sort(() => Math.random() - 0.5);
+  const emptyItems = shuffledItems.filter(item => !item.querySelector('.circle'));
+
+
+
+  for (let i = 0; i < count && i < shuffledItems.length; i++) {
+
+    setTimeout(() => {
+
+      const item = shuffledItems[i];
       const circle = document.createElement('div');
-      const totalcircle = document.querySelectorAll('.circle').length;
-
-  
-      circle.className = "circle";
-      targetItem.appendChild(circle);
-      activeCircle = circle;
-
-      // Click to destroy early and spawn new one
-      circle.onclick = () => {
+      circle.style.animation = `pop ${timer}s ease-in-out forwards`;
+      circle.className = 'circle';
+      item.appendChild(circle);
+      
+      circle.addEventListener('click', () => {
         points++;
-        scoreDisplay.textContent = points;
-        clearTimeout(circleTimeout);
+        updateScore();
         circle.remove();
-        targetItem.style.backgroundColor = "";
-        spawnCircle(); // Spawn new one immediately
-      };
+        // Remove the circle on click
+      });
 
-      // Auto-remove after 2 seconds and spawn new
-      circleTimeout = setTimeout(() => {
-        if (circle.parentElement) {
-          circle.remove();
-          targetItem.style.backgroundColor = "";
-          
-        }
-        
-        spawnCircle();
-         // Auto-respawn after timeout
-      }, 2000);
-    
-      }
+      setTimeout(() => {
+        circle.remove();
+      }, timer * 1000);
+    },  timer * 1000); // Delay each spawn
+  }
 
-    // Start the loop
-    spawnCircle();
+  // Call spawnCircle again after all circles finished
+  setTimeout(() => {
+    spawnCircle(count);
+  }, count * timer * 1000);
+}
 
+spawnCircle(1);
+updateScore();
   </script>
 </body>
 </html>
