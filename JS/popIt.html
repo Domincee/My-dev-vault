@@ -56,7 +56,6 @@
  
     .circle {
       position: absolute;
-      background-color: rgb(51, 0, 255);
       width: 80%;
       aspect-ratio: 1 / 1; /* Ensures it's always a square */
       border-radius: 50%; /* Makes it a circle */
@@ -145,7 +144,7 @@
   </div>
 
  <script>
- let items = 100;
+let items = 100;
 let points = 0;
 
 const grid = document.getElementById('grid');
@@ -165,96 +164,133 @@ grid.style.gridTemplateRows = `repeat(${size}, 1fr)`;
 
 
 let timer = 1.5;
-let redCircleCount = 0;
-let nextThreshold = 20; 
-let mutiplier = 1.5; 
 
-const levels = [...document.querySelectorAll('.level')];
 
-levels.forEach(level => {
+let itemList = [
+  { name: "blue", weight: 60},
+  { name: "red", weight: 20 },
+  { name: "life", weight: 20 },
+  { name: "gun", weight: 10 }
+]
 
-  level.addEventListener('click', () => {
-    levels.forEach(l => l.classList.remove('active'));
-    level.classList.add('active');
-
-    switch (level.id) {
-   
-      case 'easy':
-        points = 0; 
-        redCircleCount = 1;
-        timer = 1.5;
-          grid.style.borderWidth = '1px';
-        break;
-      case 'normal':
-          points = 0; //
-        timer = 1.2;
-        redCircleCount = 2;
-        grid.style.borderWidth = '3px'; // Reset border width
-        break;
-      case 'hard':
-          points = 0; //
-        timer = 0.8;
-        redCircleCount = 3;
-         // Reset red circle count
-          grid.style.borderWidth = '5px';
-        break;
-
-      case 'endless':
-          points = 0;
-        timer = 0.5;
-            grid.style.borderWidth = '7px';
-        break;
+function randomizer(items){
+  let totalWeight = itemList.reduce((sum, item) => sum + item.weight, 0);
+  let randomNum = Math.random() * totalWeight;
+  for (let item of itemList) {
+    if (randomNum < item.weight) {
+      return item.name;
     }
-    scoreDisplay.textContent = points; // Reset score display
-  });
-});
+    randomNum -= item.weight;
+  }
+}
 
-function updateScore() {
-
-  scoreDisplay.textContent = points;
-} 
-
-
-
-function spawnCircle(count = 3) {
-  console.log(`Spawning ${count} circles every ${timer} seconds`);
-  const allItems = [...document.querySelectorAll('.item')];
-  const shuffledItems = allItems.sort(() => Math.random() - 0.5);
-  const emptyItems = shuffledItems.filter(item => !item.querySelector('.circle'));
-
-
-
-  for (let i = 0; i < count && i < shuffledItems.length; i++) {
-
-    setTimeout(() => {
-
-      const item = shuffledItems[i];
+function itemCircle(){
       const circle = document.createElement('div');
-      circle.style.animation = `pop ${timer}s ease-in-out forwards`;
       circle.className = 'circle';
-      item.appendChild(circle);
-      
+
+
       circle.addEventListener('click', () => {
         points++;
         updateScore();
         circle.remove();
-        // Remove the circle on click
       });
+      return circle;
+    }
 
-      setTimeout(() => {
-        circle.remove();
-      }, timer * 1000);
-    },  timer * 1000); // Delay each spawn
+function checkConditions(name) {
+  const circle = itemCircle();
+  switch (name) {
+    case 'blue':
+      circle.style.backgroundColor = 'blue';
+      break;
+    case 'red':
+      circle.style.backgroundColor = 'red';
+      break;
+    case 'life':
+      circle.style.backgroundColor = 'green';
+      break;
+    case 'gun':
+      circle.style.backgroundColor = 'black';
+      break;
+    default:
+      circle.style.backgroundColor = 'gray';
   }
-
-  // Call spawnCircle again after all circles finished
-  setTimeout(() => {
-    spawnCircle(count);
-  }, count * timer * 1000);
+  return circle;
 }
 
-spawnCircle(1);
-updateScore();
+function spawnItem(timer){
+  const allItems = [...document.querySelectorAll('.item')];
+  const shuffledItems = allItems.sort(() => Math.random() - 0.5);
+
+  const pickedItems = randomizer(itemList);// get random item from itemlist , assume its Blue
+
+  setTimeout(() => {
+    const toBeSpawn = checkConditions(pickedItems);//call checkConditions to get what matches the random item
+    shuffledItems.appendChild(toBeSpawn);//append the  to the item
+
+  }, timer);
+
+
+}
+
+let multiplier = 1;
+const levels = [...document.querySelectorAll('.level')];
+  levels.forEach(level => {
+
+    level.addEventListener('click', () => {
+      levels.forEach(l => l.classList.remove('active'));
+
+      level.classList.add('active');
+
+      switch (level.id) {
+
+        case 'easy':
+          multiplier = 1;
+          console.log('Easy level selected');
+          grid.style.borderWidth = '1px';
+          break;
+
+        case 'normal':
+          multiplier = 1.5;
+          console.log('Normal level selected');
+          grid.style.borderWidth = '3px';
+          break;
+
+        case 'hard':
+          multiplier = 2;
+          console.log('Hard level selected');
+          grid.style.borderWidth = '5px';
+          break;
+
+
+        case 'endless':
+
+          console.log('Endless level selected');
+          grid.style.borderWidth = '7px';
+          break;
+      }
+      scoreDisplay.textContent = points;
+    });
+  });
+
+
+
+function endlessMode(){
+  multiplier = 1;
+  let threshold = 40;
+
+  if(points >= threshold){
+    multiplier += 0.5;
+    threshold *= 2.5;
+    timer += multiplier;
+
+  }
+}
+
+function updateScore() {
+  scoreDisplay.textContent = points;
+} 
+
   </script>
 </body>
 </html>
