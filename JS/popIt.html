@@ -26,7 +26,20 @@
       font-weight: bold;
       color: #333;
     }
-
+    .health-bar-container{
+      position: relative;
+      width: 90%;
+      max-width: 500px;
+      height: 20px;
+      background-color: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .health-bar{
+      background-color: #333;
+      transition: width 0.5s ease-in-out;
+    }
     .wrapper {
       height: 90%;
       width: 90vw;
@@ -45,7 +58,7 @@
         margin: auto;   
     }
 
-    .item {
+    .boxes {
       position: relative;
       border: 1px solid rgb(109, 0, 243);
       display: flex;
@@ -56,6 +69,7 @@
  
     .circle {
       position: absolute;
+      background-color: #333;
       width: 80%;
       aspect-ratio: 1 / 1; /* Ensures it's always a square */
       border-radius: 50%; /* Makes it a circle */
@@ -127,10 +141,20 @@
     padding: 8px 12px;
   }
 }
+/*notification for game over */
+
+
   </style>
 </head>
 <body>
+
   <div class="score-board">Points: <span id="score">0</span></div>
+
+  <div class="health-bar-container">
+      <div class="health-bar" id="healthBar"></div>
+  </div>
+  
+</div>
   <div class="wrapper">
     <div class="grid" id="grid"></div>
   </div>
@@ -145,15 +169,39 @@
 
  <script>
 let items = 100;
-let points = 0;
+let health = 10;
 
+const healthBar = document.getElementById('healthBar');
+
+function updateHealthBar() {
+  healthBar.style.width = `${health}%`;
+  healthBar.style.backgroundColor = '#333';
+  healthBar.style.height = '100%';
+    
+}
+function decreaseHealth(){
+  setInterval(() => {
+    if (health > 0) {
+      health -= 1; // Decrease health by 1 every second
+      updateHealthBar();
+    }
+  }, 500);
+}
+/* ADD HERE GAME OVER NOTIF  */
+/* ADD DIFFULTY */
+/* SET MULTIPLIER FOR EACH DIF */
+/* ADD ENDLESS MODE  */
+/* ADD ITEM heart,gun,shield, etc */
+/* ADD ANIMATION  */
+decreaseHealth();
+updateHealthBar();
 const grid = document.getElementById('grid');
 const scoreDisplay = document.getElementById('score');
 
 // Generate the grid items
 for (let i = 0; i < items; i++) {
   const item = document.createElement('div');
-  item.className = "item";
+  item.className = "boxes";
   grid.appendChild(item);
 }
 
@@ -163,133 +211,111 @@ grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
 grid.style.gridTemplateRows = `repeat(${size}, 1fr)`;
 
 
-let timer = 1.5;
+let points = 0;
+let multiplier = 1;
+
+const boxes = document.querySelectorAll('.boxes');
 
 
 let itemList = [
-  { name: "blue", weight: 60},
-  { name: "red", weight: 20 },
-  { name: "life", weight: 20 },
-  { name: "gun", weight: 10 }
+  {name: 'blueCircle', color: 'blue' , weight: 80},
+  {name: 'redCircle', color: 'red', weight: 20}
 ]
 
-function randomizer(items){
-  let totalWeight = itemList.reduce((sum, item) => sum + item.weight, 0);
-  let randomNum = Math.random() * totalWeight;
-  for (let item of itemList) {
-    if (randomNum < item.weight) {
-      return item.name;
+
+
+function createItem(itemList){
+  //get a random item from the itemList
+  let randomItem = itemList[Math.floor(Math.random() * itemList.length)];
+  let randomItemName = randomItem.name;
+
+  //get a random number based on the weight of the item
+  let sumWeigth = itemList.reduce((acc, item) => acc + item.weight, 0);
+  let randomWeight = Math.floor(Math.random() * sumWeigth);
+  let cumulativeWeight = 0;
+
+  for (let item of itemList) { //loop through the itemList
+    cumulativeWeight += item.weight; //get the first index weight 
+    if (randomWeight < cumulativeWeight) { //compare the random weight with the cumulative weight
+      randomItemName = item.name; // set the random item name to the current item name
+      break;
     }
-    randomNum -= item.weight;
+    //if the random weight is greater than the cumulative weight, continue to the next item
+    //ex. if in itemList the first index weight is 80 and the randomWeight is 90
+    //it will continue to the next item untill it will get the result
+    //if the 2nd index weight is 20 then return the 2nd index item name
   }
-}
-
-function itemCircle(){
-      const circle = document.createElement('div');
-      circle.className = 'circle';
-
-
-      circle.addEventListener('click', () => {
-        points++;
-        updateScore();
-        circle.remove();
-      });
-      return circle;
+  //remove existing circles before creating a new one
+  boxes.forEach(box => {
+    const existingCircle = box.querySelector('.circle');
+    if (existingCircle) {
+      existingCircle.remove();
     }
-
-function checkConditions(name) {
-  const circle = itemCircle();
-  switch (name) {
-    case 'blue':
-      circle.style.backgroundColor = 'blue';
-      break;
-    case 'red':
-      circle.style.backgroundColor = 'red';
-      break;
-    case 'life':
-      circle.style.backgroundColor = 'green';
-      break;
-    case 'gun':
-      circle.style.backgroundColor = 'black';
-      break;
-    default:
-      circle.style.backgroundColor = 'gray';
-  }
-  return circle;
-}
-
-function spawnItem(timer){
-  const allItems = [...document.querySelectorAll('.item')];
-  const shuffledItems = allItems.sort(() => Math.random() - 0.5);
-
-  const pickedItems = randomizer(itemList);// get random item from itemlist , assume its Blue
-
-  setTimeout(() => {
-    const toBeSpawn = checkConditions(pickedItems);//call checkConditions to get what matches the random item
-    shuffledItems.appendChild(toBeSpawn);//append the  to the item
-
-  }, timer);
-
-
-}
-
-let multiplier = 1;
-const levels = [...document.querySelectorAll('.level')];
-  levels.forEach(level => {
-
-    level.addEventListener('click', () => {
-      levels.forEach(l => l.classList.remove('active'));
-
-      level.classList.add('active');
-
-      switch (level.id) {
-
-        case 'easy':
-          multiplier = 1;
-          console.log('Easy level selected');
-          grid.style.borderWidth = '1px';
-          break;
-
-        case 'normal':
-          multiplier = 1.5;
-          console.log('Normal level selected');
-          grid.style.borderWidth = '3px';
-          break;
-
-        case 'hard':
-          multiplier = 2;
-          console.log('Hard level selected');
-          grid.style.borderWidth = '5px';
-          break;
-
-
-        case 'endless':
-
-          console.log('Endless level selected');
-          grid.style.borderWidth = '7px';
-          break;
-      }
-      scoreDisplay.textContent = points;
-    });
   });
 
 
+  //get a random place imdex in the boxes 
+  let randomPlaceIndex = Math.floor(Math.random() * boxes.length);
+  let targetBox = boxes[randomPlaceIndex];
 
-function endlessMode(){
-  multiplier = 1;
-  let threshold = 40;
 
-  if(points >= threshold){
-    multiplier += 0.5;
-    threshold *= 2.5;
-    timer += multiplier;
+  let div = document.createElement('div');
+  div.className = 'circle';
 
+  let clicked = false
+  if(randomItemName === 'blueCircle') {
+    div.addEventListener('click', () => {
+      if(clicked) return; // Prevent multiple clicks
+
+      clicked = true; // Mark as clicked
+      console.log('Clicked blue circle');
+      points += 1
+      health +=5;
+      updateScore();
+      updateHealthBar();
+      div.remove();
+
+    })
+    div.classList.add('blue');
+    div.style.backgroundColor = 'blue';   
+    
+    
+
+  } else if(randomItemName === 'redCircle') {
+    div.addEventListener('click', () => {
+      if(clicked) return; // Prevent multiple clicks
+      clicked = true; // Mark as clicked
+      console.log('Clicked red circle');
+      health -= 10; 
+      updateHealthBar();
+      div.remove();
+      updateScore();
+    })
+    div.classList.add('red'); 
+    div.style.backgroundColor = 'red';
+ 
+ 
   }
+  targetBox.appendChild(div);
+
+
 }
+
 
 function updateScore() {
   scoreDisplay.textContent = points;
-} 
+}
+
+
+let timer = 2;
+function delaySpawn(timer){
+  setInterval(() => {
+    createItem(itemList);
+  }, timer * 1000);
+}
+
+delaySpawn(timer);
+
 
   </script>
 </body>
