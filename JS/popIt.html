@@ -170,6 +170,7 @@
  <script>
 let items = 100;
 let health = 10;
+let multiplierByLevel = 1;
 
 const healthBar = document.getElementById('healthBar');
 
@@ -182,8 +183,20 @@ function updateHealthBar() {
 function decreaseHealth(){
   setInterval(() => {
     if (health > 0) {
-      health -= 1; // Decrease health by 1 every second
+      health -= 1; // Decrease health by 0.5 every second
       updateHealthBar();
+    
+    if(health === 0){
+      //remove all circles
+
+      document.querySelectorAll('.circle').forEach(circle => {
+        circle.remove();
+      });
+
+      clearInterval(spawnItemInterval); // Stop the health decrease interval
+      //stop the loop of creating circles
+    }
+   
     }
   }, 500);
 }
@@ -230,11 +243,11 @@ function createItem(itemList){
   let randomItemName = randomItem.name;
 
   //get a random number based on the weight of the item
-  let sumWeigth = itemList.reduce((acc, item) => acc + item.weight, 0);
-  let randomWeight = Math.floor(Math.random() * sumWeigth);
-  let cumulativeWeight = 0;
+  let sumWeigth = itemList.reduce((acc, item) => acc + item.weight, 0); // calculate the sum of all weights
+  let randomWeight = Math.floor(Math.random() * sumWeigth); // generate a random number between 0 and the sum of weights
+  let cumulativeWeight = 0; // variable to keep track of the cumulative weight/current weight
 
-  for (let item of itemList) { //loop through the itemList
+  for (let item of itemList) { //loop through the itemList 
     cumulativeWeight += item.weight; //get the first index weight 
     if (randomWeight < cumulativeWeight) { //compare the random weight with the cumulative weight
       randomItemName = item.name; // set the random item name to the current item name
@@ -253,7 +266,6 @@ function createItem(itemList){
     }
   });
 
-
   //get a random place imdex in the boxes 
   let randomPlaceIndex = Math.floor(Math.random() * boxes.length);
   let targetBox = boxes[randomPlaceIndex];
@@ -271,10 +283,11 @@ function createItem(itemList){
       console.log('Clicked blue circle');
       points += 1
       health +=5;
-      updateScore();
-      updateHealthBar();
-      div.remove();
 
+
+      updateScore();
+      div.remove();
+      updateHealthBar();
     })
     div.classList.add('blue');
     div.style.backgroundColor = 'blue';   
@@ -286,10 +299,13 @@ function createItem(itemList){
       if(clicked) return; // Prevent multiple clicks
       clicked = true; // Mark as clicked
       console.log('Clicked red circle');
-      health -= 10; 
-      updateHealthBar();
+
+      
+      health = Math.max(0, health - 5)
+
+      console.log('Health:', health);
       div.remove();
-      updateScore();
+      updateHealthBar();
     })
     div.classList.add('red'); 
     div.style.backgroundColor = 'red';
@@ -307,9 +323,10 @@ function updateScore() {
 }
 
 
+let spawnItemInterval;
 let timer = 2;
 function delaySpawn(timer){
-  setInterval(() => {
+  spawnItemInterval = setInterval(() => {
     createItem(itemList);
   }, timer * 1000);
 }
