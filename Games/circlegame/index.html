@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PopIt Game</title>
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/objects.css" />
+  <link rel="stylesheet" href="css/layers.css" />
+</head>
+<body>
+  <div id="game-container"></div>
+
+ <script type="module">
+  import { GameUI } from './js/gameUI.js';
+  import { GameLogic } from './js/gameLogic.js';
+
+  GameUI.createLayout();
+  GameLogic.initGame('easy');
+</script>
+</body>
+
+</html>

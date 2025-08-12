@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+  .box {
+    width: 100px; height: 100px; background: green; position: relative;
+  }
+</style>
+
+<div id="box" class="box"></div>
+
+<script>
+const box = document.getElementById('box');
+let currentX = 0;
+let animationId = null;
+
+function animateStep() {
+  const moveDistance = 50;
+  const newX = currentX + moveDistance;
+
+  // Animate one step
+  box.animate([
+    { transform: `translateX(${currentX}px)` },
+    { transform: `translateX(${newX}px)` }
+  ], { duration: 300, fill: 'forwards' })
+  .onfinish = () => {
+    currentX = newX;
+    if (animationId !== null) {
+      animateStep();  // continue animating if mouse still over
+    }
+  };
+}
+
+// Start animation on mouseenter
+box.addEventListener('mouseenter', () => {
+  if (animationId === null) {
+    animationId = true;  // flag that animation should run
+    animateStep();
+  }
+});
+
+// Stop animation on mouseleave
+box.addEventListener('mouseleave', () => {
+  animationId = null;  // stop animation loop
+});
+
+
+</script>
+
+    
+</body>
+</html>
