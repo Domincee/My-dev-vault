@@ -1,0 +1,132 @@
+body {
+  margin: 0;
+}
+
+.container {
+  height: 100vh;
+  display: flex;
+  gap: 15px;
+  flex-direction: column;
+}
+
+.top-container {
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: auto;
+  flex-direction: column;
+}
+
+.bottom-container {
+
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+    width: 100%;
+  padding-bottom: 10px;
+  }
+
+/* Buttons */
+
+.bottom-container button {
+  padding: 10px 15px;
+  width: 150px;
+  border: none;
+  background-color: #4c00ff;
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Scoreboard */
+.score-board {
+  font-size: 1.5rem;
+  margin: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Health bar */
+.health-bar-container {
+  position: relative;
+  width: 90%;
+  max-height: 10px;
+  min-height: 10px;
+  background-color: #412727;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.health-bar {
+  background-color: #536ae7;
+  transition: width 0.5s ease-in-out;
+  height: 100%;
+}
+
+/* Wrapper & Grid */
+.wrapper {
+  display: flex;
+  width: 100%;
+  height: auto;
+  justify-content: center;
+}
+
+.grid {
+  display: grid;
+  border: 1px solid rgb(109, 0, 243);
+  width: min(90vw, 90vh); /* Always square */
+  aspect-ratio: 1/1;
+}
+
+.boxes {
+  position: relative;
+  border: 1px solid rgb(109, 0, 243);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .container {
+    height: auto;
+    padding: 10px;
+  }
+
+  .bottom-container {
+    bottom: 10px;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px;
+    border-radius: 10px;
+    z-index: 1000;
+  }
+
+  .bottom-container button {
+    width: 100%;
+    max-width: 150px;
+  }
+
+  .grid {
+    max-width: 95vw;
+  }
+}
+
+@media (max-width: 480px) {
+  .score-board {
+    font-size: 1.2rem;
+  }
+
+  .health-bar-container {
+    width: 100%;
+  }
+
+  .bottom-container button {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+}
