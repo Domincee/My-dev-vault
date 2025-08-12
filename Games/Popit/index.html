@@ -40,33 +40,5 @@
 
 
 </body>
-<script>
-
-let gameState = {
-  items : 100,
-  health : 100,
-  maxHealth:100,
-  minHealh:0,
-  points : 0,
-  multiplier : 1, 
-  spawnRate : 1, //1sec spawn item
-  topScore: null,
-  threshold:null,
-  hpMulipier : 0,
-
-}
-const grid = document.getElementById('grid');
-
-// Generate the grid items
-for (let i = 0; i < gameState.items; i++) {
-  const item = document.createElement('div');
-  item.className = "boxes";
-  grid.appendChild(item);
-}
-
-// Set grid layout size
-const size = Math.ceil(Math.sqrt(gameState.items));
-grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
-grid.style.gridTemplateRows = `repeat(${size}, 1fr)`;
-</script>
+<script src="/Games/Popit/js/main.js" type="module"></script>
 </html>

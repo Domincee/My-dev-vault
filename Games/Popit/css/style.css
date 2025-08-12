@@ -52,19 +52,19 @@ body {
 /* Health bar */
 .health-bar-container {
   position: relative;
-  width: 90%;
-  max-height: 10px;
-  min-height: 10px;
-  background-color: #412727;
+  width: 100%;
+  min-height: 15px;
+  border: 1.5px solid black;
   border-radius: 10px;
   overflow: hidden;
-  margin-bottom: 20px;
 }
 
 .health-bar {
-  background-color: #536ae7;
-  transition: width 0.5s ease-in-out;
+  position: absolute;
+  background-color: #949dcb;
   height: 100%;
+  width: 100%;
+  transition: none;
 }
 
 /* Wrapper & Grid */
