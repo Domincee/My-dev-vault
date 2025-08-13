@@ -1,0 +1,161 @@
+/* objects.css */
+
+/* Grid container */
+.grid {
+  display: grid;
+  width: 100%;
+  max-width: 600px;
+  aspect-ratio: 1 / 1; /* Maintain square */
+  background: #222;
+  border-radius: 8px;
+  gap: 4px;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+/* Each box inside grid */
+.boxes {
+  background: #333;
+  border-radius: 6px;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  overflow: visible;
+}
+
+/* Circles inside boxes */
+.circle {
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  margin: auto;
+  position: absolute;
+  top: 15%;
+  left: 15%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.3s ease;
+  will-change: transform;
+  /* Anim scale up on spawn */
+  animation: scaleUp 0.3s forwards;
+  box-shadow: 0 0 8px currentColor;
+}
+
+@keyframes scaleUp {
+  0% { transform: scale(0); }
+  100% { transform: scale(1.1); }
+}
+
+/* Blue and Red circle colors */
+.circle.blue {
+  width: 100%;
+  height: 100%;
+  background-color: #0080ff;
+  color: #66bbff;
+}
+
+.circle.red {
+  background-color: #ff3333;
+  color: #ff6666;
+}
+
+/* Boss circle (big) */
+.circle.boss {
+  background-color: #aa00ff;
+  box-shadow: 0 0 20px #cc66ff;
+  cursor: pointer;
+  animation: scaleUp 0.3s forwards;
+}
+
+/* Scoreboard */
+.scoreboard {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+/* Health bar container */
+.health-bar-container {
+  margin-top: 8px;
+  height: 20px;
+  width: 100%;
+  background: #444;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.boss-health-bar{
+  top: 5%;
+  position: absolute;
+  width: 250px;
+  height: 10px;
+  border-radius: 5px;
+  border: 2px solid rgb(255, 15, 15);
+  overflow: hidden;
+}
+.boss-health-bar-fill{
+ position: absolute;
+  height: 20px;
+   background: #f10905;
+}
+/* Health bar filling */
+.health-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff00, #00aa00);
+  width: 100%; /* Dynamically updated */
+  transition: width 0.5s ease;
+  border-radius: 12px 0 0 12px;
+}
+
+.hpboss{
+    font-size: 1rem;
+    font-weight: bold;
+    color: red;
+    position: absolute;
+    top: 2%;
+}
+/* Buttons */
+button.difficulty-btn {
+  padding: 10px 20px;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background-color: #555;
+  color: white;
+  transition: background-color 0.3s ease;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+button.difficulty-btn:hover,
+button.difficulty-btn.active {
+  background-color: #00aaff;
+  color: white;
+}
+
+/* Restart button */
+#restart-btn {
+  margin-top: 15px;
+  padding: 12px 25px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background-color: #aa0000;
+  color: white;
+  display: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+#restart-btn:hover {
+  background-color: #ff4444;
+}

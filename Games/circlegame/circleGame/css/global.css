@@ -1,0 +1,23 @@
+/* global.css */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: #eee;
+  -webkit-tap-highlight-color: transparent; /* For mobile touch optimization */
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  user-select: none; /* Prevent text selection on touch */
+}

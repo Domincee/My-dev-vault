@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PopIt Game</title>
+
+  <!-- CSS Files (make sure names match exactly!) -->
+  <link rel="stylesheet" href="./css/global.css">
+  <link rel="stylesheet" href="./css/layers.css">
+  <link rel="stylesheet" href="./css/objects.css">
+  <link rel="stylesheet" href="./css/animation.css">
+</head>
+<body>
+  <!-- Game Container -->
+  <div id="game-container"></div>
+  <!-- REMOVE this line: <span id="score">0</span> -->
+
+  <!-- Game Scripts -->
+  <script type="module">
+    import "./js/utils.js";
+    import "./js/items.js";
+    import { GameUI } from "./js/GameUi.js"; // Make sure the case matches your file!
+    import { GameLogic } from "./js/gameLogic.js";
+
+    // Wait for DOM to be fully ready
+    window.addEventListener("DOMContentLoaded", () => {
+      // Build UI first
+      GameUI.createLayout();
+
+      // Initialize game after UI is built
+      setTimeout(() => {
+        GameLogic.initGame('endless'); // 'easy' | 'normal' | 'hard' | 'endless'
+      }, 50);
+    });
+  </script>
+</body>
+</html>
