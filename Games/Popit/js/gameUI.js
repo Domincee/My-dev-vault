@@ -4,8 +4,6 @@ const grid = document.getElementById('grid');
 
 
 
-
-
 export function generateGrid(){
 for (let i = 0; i < gameState.items; i++) {
   const item = document.createElement('div');

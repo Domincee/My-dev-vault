@@ -1,0 +1,58 @@
+  * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: sans-serif;
+      background-color: var(--bg-color);
+
+    }
+
+    button{
+        width: fit-content;
+        padding: 5px 10px 5px 10px;
+        height: fit-content;
+        border-radius: 8px;
+        background-color: blue;
+        color: white;
+        font-weight: bold;
+        transition: all 0.3s ease-in-out;
+    }
+
+    button:hover{
+        background-color: blueviolet;
+        scale: 1.1;
+
+    }
+
+
+:root {
+  --bg-color: #0c162a;
+  --text-color: #876767;
+  --primary-color: #4f4568;
+  --secondary-color: #f0f0f0;
+  --accent-color: #635252;
+}
+
+/* Red Theme */
+[data-theme="red"] {
+  --bg-color: #860f0f;
+  --text-color: #f13535;
+  --primary-color: #9f0c0c;
+  --secondary-color: #ffe0e0;
+  --accent-color: #aa0000;
+}
+
+/* Blue Theme */
+[data-theme="blue"] {
+  --bg-color: #0d086d;
+  --text-color: #6493ef;
+  --primary-color: #10519a;
+  --secondary-color: #d0e8ff;
+  --accent-color: #004c99;
+}
