@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Three.js GLTF Example</title>
+    <style>
+      body { margin: 0; overflow: hidden; }
+      canvas { display: block; }
+    </style>
+  </head>
+  <body>
+    <canvas id="webgl"></canvas>
+
+    <script type="module">
+      import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js";
+      import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/loaders/GLTFLoader.js";
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("webgl") });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      // Light so the model is visible
+      const light = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
+      light.position.set(0, 20, 10);
+      scene.add(light);
+
+      const loader = new GLTFLoader();
+      loader.load(
+        "https://models.readyplayer.me/689e0cfac911aabc2ec5026a.glb", // your direct link
+        function (gltf) {
+          scene.add(gltf.scene);
+          gltf.scene.position.set(0, -1, 0);
+          console.log("Model loaded!");
+        },
+        function (xhr) {
+          console.log((xhr.loaded / xhr.total * 100) + "% loaded");
+        },
+        function (error) {
+          console.error("Error loading model:", error);
+        }
+      );
+
+      camera.position.z = 3;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    </script>
+  </body>
+</html>

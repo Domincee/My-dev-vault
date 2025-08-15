@@ -1,11 +1,11 @@
 
     .circle {
-      position: absolute;
-      background-color: #333;
-      width: 80%;
+      background-color: var(--circle-color);
+      width: 100%;
       aspect-ratio: 1 / 1; /* Ensures it's always a square */
-      border-radius: 50%; /* Makes it a circle */
-      transition: all 1s ease-in-out;
+      transition: all 0.3s ease-in-out;
+      border-radius: 8px;
+      box-shadow: 0 0 2px 2px var(--circle-color);
     }
     .circle:hover {
       background-color: rgb(81, 73, 244);

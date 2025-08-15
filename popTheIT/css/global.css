@@ -36,16 +36,22 @@
   --text-color: #876767;
   --primary-color: #4f4568;
   --secondary-color: #f0f0f0;
+  --box-border-color: #91919ffb;
   --accent-color: #635252;
+  --hovered-color: #0000;
+  --circle-color: #001cbc;
 }
 
 /* Red Theme */
 [data-theme="red"] {
   --bg-color: #860f0f;
-  --text-color: #f13535;
-  --primary-color: #9f0c0c;
-  --secondary-color: #ffe0e0;
-  --accent-color: #aa0000;
+  --text-color: #ffa1a1;
+  --primary-color: #956815;
+  --secondary-color: #fbbc7df2;
+  --box-border-color: #d58000fd;
+  --accent-color: #7bb900;
+  --hovered-color: #08213830;
+  --circle-color: #6f02e3;
 }
 
 /* Blue Theme */
@@ -54,5 +60,8 @@
   --text-color: #6493ef;
   --primary-color: #10519a;
   --secondary-color: #d0e8ff;
+ --box-border-color: #ff0000c0;
   --accent-color: #004c99;
+  --hovered-color: #46c0584f;
+    --circle-color: #ae0000;
 }

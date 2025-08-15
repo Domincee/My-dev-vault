@@ -38,15 +38,31 @@
     </body>
 
     <script type="module">
-        import {generateGrid, ThemeManager } from './js/gameUI.js';
+        import {generateGrid, ThemeManager, itemCreation } from './js/gameUI.js';
         import {gameState } from './js/gameState.js';
+
         generateGrid(gameState.item);
-
-
-      
-
+        itemCreation.createItem();
         document.addEventListener("DOMContentLoaded", () => {
         ThemeManager.changeTheme(); 
         });
+
+
+let damage = 3;
+let bossHealth = 50;
+let maxHealth = 50;
+const boss = document.querySelector('.boss');
+
+circle.style.width = "100%"; // full width initially
+
+circle.addEventListener('click', () => {
+    // decrease boss health
+    bossHealth = Math.max(bossHealth - damage, 0);
+
+    // set width proportional to health
+    circle.style.width = (bossHealth / maxHealth * 100) + "%";
+
+    console.log(`Boss Health: ${bossHealth}`);
+});
     </script>
 </html>

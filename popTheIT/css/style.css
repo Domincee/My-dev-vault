@@ -48,12 +48,34 @@ body {
   box-shadow: 0 3px 6px rgba(0,0,0,0.2);
 }
 
+.cons-item:hover{
+  background-color: var(--hovered-color);
+}
+
 /* EMPTY item */
 .cons-item.empty {
+  position: relative;
   background-color: transparent;
-  border: 2px dashed var(--accent-color);
   color: var(--accent-color);
 }
+
+.cons-item.empty::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px dashed var(--accent-color);
+  animation: lightToDark 2s linear infinite;
+}
+
+@keyframes lightToDark {
+  from {
+    filter: brightness(1.5); /* very bright */
+  }
+  to {
+    filter: brightness(0.5); /* darker */
+  }
+}
+
 
 /* Buttons */
 .bottom-container button {
@@ -115,7 +137,7 @@ body {
 }
 
 .boxes {
-  border: 1px solid var(--text-color);
+  border: 2px solid var(--box-border-color);
   display: flex;
   align-items: center;
   justify-content: center;
