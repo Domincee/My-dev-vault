@@ -5,24 +5,25 @@
       aspect-ratio: 1 / 1; /* Ensures it's always a square */
       transition: all 0.3s ease-in-out;
       border-radius: 8px;
-      box-shadow: 0 0 2px 2px var(--circle-color);
+      position: relative;
     }
     .circle:hover {
-      background-color: rgb(81, 73, 244);
       cursor: pointer;
     }
 
-    @keyframes pop {
-      0% {
-        transform: scale(1);
-        opacity: 1;
-      }
-      50% {
-        transform: scale(1.2);
-        opacity: 0.5;
-      }
-      100% {
-        transform: scale(0);
-        opacity: 0;
-      }
+
+    .circle.red:hover{
+      background-color: rgb(129, 3, 3);
+    }
+    .circle.red{
+      background-color: red;
+       box-shadow: 0 0 2px 2px rgb(255, 28, 28));
+
+    }
+    .circle.blue:hover{
+      background-color: rgb(3, 3, 99);
+    }
+    .circle.blue{
+    box-shadow: 0 0 2px 2px rgb(69, 69, 255);
+
     }

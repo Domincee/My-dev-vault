@@ -20,6 +20,7 @@ body {
   display: flex;
   align-items: center;
   width: 100%;
+  position: relative;
   flex-direction: column;
 }
 
@@ -142,6 +143,31 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
+  position: relative;
+}
+
+
+.combo-count{
+  position: absolute;
+  right: 0;
+  opacity: 0;
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+  font-weight: bold;
+  color:  var(--text-color);
+  animation: combo 0.3s infinite forwards;
+}
+
+@keyframes combo {
+  from{
+    scale: 1;
+  }
+  to{
+    scale: 1.2;
+  }
+
+  
+  
 }
 
 /* Theme selector */

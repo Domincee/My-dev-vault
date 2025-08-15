@@ -7,13 +7,15 @@
         <link rel="stylesheet" href="css/global.css">
         <link rel="stylesheet" href="css/object.css">
         <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/effect.css">
     </head>
     <body>
         <div class="container">
             <div class="top-container">
+                <span class="combo-count" id="comboCount">0</span>
                 <div class="score-board" id="scoreboard">Score: 0</div>
                 <div class="health-bar-container">
-                    <div class="health-bar-fill"></div>
+                    <div class="health-bar-fill" id="healthBar"></div>
                 </div>
             </div>
             <div class="middle-container">
@@ -37,32 +39,6 @@
             </select>
     </body>
 
-    <script type="module">
-        import {generateGrid, ThemeManager, itemCreation } from './js/gameUI.js';
-        import {gameState } from './js/gameState.js';
+    <script type="module" src="./js/main.js"></script>
 
-        generateGrid(gameState.item);
-        itemCreation.createItem();
-        document.addEventListener("DOMContentLoaded", () => {
-        ThemeManager.changeTheme(); 
-        });
-
-
-let damage = 3;
-let bossHealth = 50;
-let maxHealth = 50;
-const boss = document.querySelector('.boss');
-
-circle.style.width = "100%"; // full width initially
-
-circle.addEventListener('click', () => {
-    // decrease boss health
-    bossHealth = Math.max(bossHealth - damage, 0);
-
-    // set width proportional to health
-    circle.style.width = (bossHealth / maxHealth * 100) + "%";
-
-    console.log(`Boss Health: ${bossHealth}`);
-});
-    </script>
 </html>

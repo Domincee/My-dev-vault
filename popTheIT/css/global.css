@@ -38,8 +38,9 @@
   --secondary-color: #f0f0f0;
   --box-border-color: #91919ffb;
   --accent-color: #635252;
-  --hovered-color: #0000;
+  --hovered-color: #bbe9218a;
   --circle-color: #001cbc;
+      --particle-color: #302ae6f2;
 }
 
 /* Red Theme */
@@ -50,8 +51,9 @@
   --secondary-color: #fbbc7df2;
   --box-border-color: #d58000fd;
   --accent-color: #7bb900;
-  --hovered-color: #08213830;
+  --hovered-color: #13380830;
   --circle-color: #6f02e3;
+      --particle-color: #3a3df6f2;
 }
 
 /* Blue Theme */
@@ -61,7 +63,8 @@
   --primary-color: #10519a;
   --secondary-color: #d0e8ff;
  --box-border-color: #ff0000c0;
-  --accent-color: #004c99;
-  --hovered-color: #46c0584f;
-    --circle-color: #ae0000;
+  --accent-color: #cc1f00;
+  --hovered-color: #6784e7dc;
+    --circle-color: #e90303;
+    --particle-color: #ff0707f2;
 }
