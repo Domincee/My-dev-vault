@@ -45,22 +45,21 @@ export const Effects = {
     }
     document.body.appendChild(text);
 
-    const grid = document.querySelector(".grid");
-    const gridRect = grid.getBoundingClientRect();
+    const body = document.body;
+    const gridRect = body.getBoundingClientRect();
 
     // Random side
     const side = Math.random() < 0.5 ? "left" : "right";
 
     // Random vertical pos
-    const randomY = gridRect.top + Math.random() * gridRect.height;
+    const randomY = Math.random() * window.innerHeight;
 
     if (side === "left") {
-      const randomX = Math.random() * (gridRect.left - 50);
+      const randomX = Math.random() * window.innerWidth +5;
       text.style.left = `${randomX}px`;
     } else {
-      const randomX =
-        gridRect.right + 20 +
-        Math.random() * (window.innerWidth - gridRect.right - 50);
+   
+        const randomX = Math.random() * window.innerWidth -5;
       text.style.left = `${randomX}px`;
     }
 
@@ -103,11 +102,60 @@ export const Effects = {
 
   // Apply glow
   item.style.boxShadow = `0 0 15px ${color}, 0 0 5px 2px ${color}`;
-
   // Remove glow after duration
   setTimeout(() => {
     item.style.boxShadow = "";
   }, duration);
-}
+},
+
+      moveToSlotEffect: (itemToMove) => {
+        const slots = document.querySelectorAll(".cons-item");
+
+        // find the first empty slot
+        const emptySlot = Array.from(slots).find(slot =>
+          slot.classList.contains("empty")
+        );
+
+        if (!emptySlot) {
+          console.log("No empty slots found.");
+          return;
+        }
+
+        // get bounding boxes
+        const toMove = itemToMove.getBoundingClientRect();
+        const target = emptySlot.getBoundingClientRect();
+
+        const targetX = target.left + target.width / 2;
+        const targetY = target.top + target.height / 2;
+
+        const toMoverX = toMove.left + toMove.width / 2;
+        const toMoverY = toMove.top + toMove.height / 2;
+
+        const dx = targetX - toMoverX;
+        const dy = targetY - toMoverY;
+
+        // smooth animation
+        itemToMove.style.transition = "transform 0.5s ease";
+        itemToMove.style.transform = `translate(${dx}px, ${dy}px)`;
+
+        
+         const newItem = itemToMove.cloneNode(true);
+          newItem.style.transform = "none"; // reset any transform
+          emptySlot.appendChild(newItem);
+
+      newItem.addEventListener("click", () => {
+        console.log("Clicked once inside the inventory!");
+        console.log(newItem + newItem.dataset.item);
+
+
+        //add function for item effect!!
+      }, { once: true });
+
+        // mark slot as filled
+        emptySlot.classList.remove("empty");
+        console.log(`Item moved to slot index ${[...slots].indexOf(emptySlot)} and marked as filled.`);
+      },
+          
 };
+
 

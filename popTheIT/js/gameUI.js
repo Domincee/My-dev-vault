@@ -1,5 +1,9 @@
 import { gameState } from "./gameState.js";
-import { itemClicked } from "./gameLogic.js";
+import {
+  itemClicked,
+  restartGame,
+  pickRandomConsumableItem,
+} from "./gameLogic.js";
 import { Effects } from "./effect.js";
 
 export const grid = document.getElementById("grid");
@@ -27,7 +31,6 @@ export const ThemeManager = {
   },
 };
 
-
 export function generateGrid(item) {
   for (let i = 0; i < item; i++) {
     const box = document.createElement("div");
@@ -42,44 +45,57 @@ export function generateGrid(item) {
   grid.style.gridTemplateRows = `repeat(${size}, 1fr)`;
 }
 
-    export const itemCreation = {
-    createItem: () => {
-        const boxes = document.querySelectorAll(".boxes");
-        const decreaseSpawnDelay = 0.3;
-        const delay = 1500 - decreaseSpawnDelay; // ms between spawns
-        const disappearSeconds = 1800; // circle disappears after 1 second
+export const itemCreation = {
+  interSpawnTimer: null,
+  createItem: () => {
+    const boxes = document.querySelectorAll(".boxes");
 
-        const spawnNext = () => {
-        // Filter boxes that do NOT already have a circle
-        const availableBoxes = Array.from(boxes).filter(
-            (box) => !box.querySelector(".circle")
-        );
+    const spawnNext = () => {
+      // Filter boxes that do NOT already have a circle
+      const availableBoxes = Array.from(boxes).filter(
+        (box) => !box.querySelector(".circle") && !box.querySelector(".item")
+      );
+      const pickRandomCircle = Math.random() < gameState.Odds ? "blue" : "red";
+      // Pick a random available box
+      const randomIndex = Math.floor(Math.random() * availableBoxes.length);
+      const targetBox = availableBoxes[randomIndex];
 
-        const pickRandomCircle = Math.random() < gameState.Odds ? "blue" : "red";
-        // Pick a random available box
-        const randomIndex = Math.floor(Math.random() * availableBoxes.length);
-        const targetBox = availableBoxes[randomIndex];
+      const div = document.createElement("div");
+      div.classList.add("circle", pickRandomCircle);
+      targetBox.appendChild(div);
 
-        const div = document.createElement("div");
-        div.classList.add("circle", pickRandomCircle); 
-        targetBox.appendChild(div);
+      // Remove the circle after disappearSeconds
+      setTimeout(() => {
+        div.remove();
+        gameState.health = gameState.health - 5;
+      }, gameState.timeManager.disappear);
 
-        // Remove the circle after disappearSeconds
-        setTimeout(() => {
-            div.remove();
-            gameState.health = gameState.health - 5;
-        }, disappearSeconds);
+      // Schedule next spawn
+      itemCreation.interSpawnTimer = setTimeout(
+        spawnNext,
+        gameState.timeManager.delaySpawner
+      );
 
-        // Schedule next spawn
-        setTimeout(spawnNext, delay);
+      itemClicked.circle(div, pickRandomCircle); //eventlistenerforclick
+    };
 
-        itemClicked.circle(div,pickRandomCircle);//eventlistenerforclick
-        };
+    spawnNext(); // start spawning
 
-        spawnNext(); // start spawning
+    return;
+  },
 
-        return ;
-    },
+  stopSpawning: () => {
+    const circle = document.querySelectorAll(".circle");
+
+    circle.forEach((e) => {
+      e.remove();
+    });
+
+    if (itemCreation.interSpawnTimer) {
+      clearTimeout(itemCreation.interSpawnTimer);
+      itemCreation.interSpawnTimer = null;
+    }
+  },
 
   initCircleBehavior: (circle, boss) => {
     const { damage, maxHealth } = boss;
@@ -100,46 +116,142 @@ export function generateGrid(item) {
   },
 };
 
-
-const scoreBoard = document.getElementById('scoreboard');
-const comboText = document.getElementById('comboCount');
-const healthBar = document.getElementById('healthBar');
-const healthBarCon = document.querySelector('.health-bar-container');
+const scoreBoard = document.getElementById("scoreboard");
+const comboText = document.getElementById("comboCount");
+const healthBar = document.getElementById("healthBar");
+const healthBarCon = document.querySelector(".health-bar-container");
 
 export const UpdateUi = {
-    ofScore : (points) =>{
-        
-        scoreBoard.textContent =   `Score: ${points}`;
+  ofScore: (points) => {
+    scoreBoard.textContent = `Score: ${points}`;
+  },
+
+  ofCombo: {
+    remove: () => {
+      if (comboText) comboText.style.opacity = 0;
     },
 
-    ofCombo: {
-
-        remove: () =>{
-            if(comboText) comboText.style.opacity = 0 ;
-        },
-
-        UpdateCombo:(combo) =>{
-          comboText.style.opacity = 1;
-          comboText.textContent = `${combo}X`;
-
-        },
-
-
+    UpdateCombo: (combo) => {
+      comboText.style.opacity = 1;
+      comboText.textContent = `${combo}X`;
     },
+  },
 
-ofHealthBar: () => {
-  const percent = (gameState.currenthealth / gameState.maxHealth) * 100;
-  healthBar.style.width = `${Math.max(percent, 0)}%`;
+  ofHealthBar: (currenthealth, maxHeath) => {
+    const percent = (currenthealth / maxHeath) * 100;
+    healthBar.style.width = `${Math.max(percent, 0)}%`;
 
     Effects.shakeElement(healthBarCon);
-},
-
-}
+  },
+};
 
 export const comboUI = {
-    remove: () =>{
-        comboText.remove();
+  remove: () => {
+    comboText.remove();
+  },
+};
+
+export const popUpNotif = {
+  gameOver: (score, highScore) => {
+    const notifContainer = document.createElement("div");
+    const labelContainer = document.createElement("div");
+    const textNotif = document.createElement("p");
+    const textScore = document.createElement("p");
+    const button = document.createElement("button");
+
+    notifContainer.className = "notif-container";
+    labelContainer.className = "label-container";
+    textNotif.className = "game-over";
+    textScore.className = "score";
+
+    button.id = "retryButton";
+
+    textNotif.textContent = "GAME OVER";
+    textScore.textContent = `Score: ${score}\nHighest Score: ${highScore}`;
+    textScore.style.whiteSpace = "pre-line"; // allow line breaks
+    button.textContent = "Retry";
+
+    document.body.appendChild(notifContainer);
+    notifContainer.appendChild(labelContainer);
+    labelContainer.appendChild(textNotif);
+    labelContainer.appendChild(textScore);
+
+    notifContainer.appendChild(button);
+
+    button.addEventListener("click", () => {
+      notifContainer.remove();
+      restartGame();
+
+
+      randomItemCreation.removeItems();
+    });
+  },
+};
+
+export const randomItemCreation = {
+  spawnConsumableItem: () => {
+    const boxes = document.querySelectorAll(".boxes");
+
+    // Pick random item once
+    const pickRandomCons = pickRandomConsumableItem(gameState.consumableItems);
+
+    // Filter boxes that do NOT already have a consumable
+    const availableBoxes = Array.from(boxes).filter(
+      (box) => !box.querySelector(".cons-item") && !box.querySelector(".item")
+    );
+
+    if (availableBoxes.length === 0) return; // no space
+
+    // Pick a random available box
+    const randomIndex = Math.floor(Math.random() * availableBoxes.length);
+    const targetBox = availableBoxes[randomIndex];
+
+    // Create consumable div
+    const div = document.createElement("div");
+    div.classList.add("item");
+    div.dataset.item = pickRandomCons.name;
+
+    if (pickRandomCons.name === "itemHealth") {
+      div.textContent = "❤️";
+    } else if (pickRandomCons.name === "itemGun") {
+      div.textContent = "🔫";
     }
 
+    // temporary emoji for testing
+    targetBox.appendChild(div);
 
-}
+    let clicked = false;
+
+    // Remove the consumable after disappearSeconds * 2
+    const disappearTimeout = setTimeout(() => {
+        div.remove();
+        console.log(`${pickRandomCons.name} disappeared!`);
+    }, gameState.timeManager.disappear * 2);
+
+
+    // Add click event
+    div.addEventListener("click", (e) => {
+      clicked = true;
+      clearTimeout(disappearTimeout);
+
+      Effects.moveToSlotEffect(e.target);
+      console.log(`Picked up ${pickRandomCons.name} (+${pickRandomCons.value})`);
+      div.remove();
+    });
+
+    console.log(`Spawned ${pickRandomCons.name}`);
+    
+  },
+
+  removeItems: () => {
+    const item = document.querySelectorAll(".item");
+
+    item.forEach((item) => {
+      if (item) {
+        const parent = item.parentElement; // save before removing
+        item.remove();
+        if (parent) parent.classList.add("empty");
+      }
+    });
+  },
+};
