@@ -13,7 +13,7 @@
 
 
 .points-text {
-  position: fixed;
+  position: absolute;
   font-size: clamp(16px, 3vw, 24px); /* auto-resize on small/large screens */
   font-weight: bold;
   color: var(--text-color);
