@@ -5,13 +5,14 @@ import {
   pickRandomConsumableItem,
 } from "./gameLogic.js";
 import { Effects } from "./effect.js";
+import { effecItemtLogic } from "./effectItemLogic.js";
+
 
 export const grid = document.getElementById("grid");
 
 export const ThemeManager = {
   getTheme(theme) {
     gameState.theme = theme;
-    console.log(gameState.theme); // optional: store in game state
   },
 
   setTheme(theme) {
@@ -42,7 +43,9 @@ export function generateGrid(item) {
 
   const size = Math.ceil(Math.sqrt(item));
   grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+  
   grid.style.gridTemplateRows = `repeat(${size}, 1fr)`;
+  intervalOfCC();
 }
 
 export const itemCreation = {
@@ -120,10 +123,12 @@ const scoreBoard = document.getElementById("scoreboard");
 const comboText = document.getElementById("comboCount");
 const healthBar = document.getElementById("healthBar");
 const healthBarCon = document.querySelector(".health-bar-container");
+const HP = document.getElementById('healthBar');
 
 export const UpdateUi = {
   ofScore: (points) => {
     scoreBoard.textContent = `Score: ${points}`;
+    effecItemtLogic.dropingItemCondition.forGun();
   },
 
   ofCombo: {
@@ -137,11 +142,12 @@ export const UpdateUi = {
     },
   },
 
-  ofHealthBar: (currenthealth, maxHeath) => {
+  ofHealthBar: (currenthealth, maxHeath,color) => {
     const percent = (currenthealth / maxHeath) * 100;
-    healthBar.style.width = `${Math.max(percent, 0)}%`;
-
-    Effects.shakeElement(healthBarCon);
+        healthBar.style.width = `${Math.max(percent, 0)}%`;
+        Effects.showPoints(gameState.hpAdded,"❤️",color);
+        UpdateUi.ofScore(gameState.points); 
+        Effects.showPoints(gameState.addPoints,"pts",color); 
   },
 };
 
@@ -189,19 +195,23 @@ export const popUpNotif = {
 };
 
 export const randomItemCreation = {
-  spawnConsumableItem: () => {
+  spawnConsumableItem: (itemToSpawn) => {
     const boxes = document.querySelectorAll(".boxes");
 
     // Pick random item once
-    const pickRandomCons = pickRandomConsumableItem(gameState.consumableItems);
-
+    if (itemToSpawn && itemToSpawn.name) {
+      } else {
+          console.error("itemToSpawn is undefined or missing a name property.");
+          return; // Or handle the case where itemToSpawn is not valid
+      }
+    
     // Filter boxes that do NOT already have a consumable
     const availableBoxes = Array.from(boxes).filter(
       (box) => !box.querySelector(".cons-item") && !box.querySelector(".item")
     );
 
     if (availableBoxes.length === 0) return; // no space
-
+    
     // Pick a random available box
     const randomIndex = Math.floor(Math.random() * availableBoxes.length);
     const targetBox = availableBoxes[randomIndex];
@@ -209,11 +219,11 @@ export const randomItemCreation = {
     // Create consumable div
     const div = document.createElement("div");
     div.classList.add("item");
-    div.dataset.item = pickRandomCons.name;
+    div.dataset.item = itemToSpawn.name;
 
-    if (pickRandomCons.name === "itemHealth") {
+    if (itemToSpawn.name === "itemHealth") {
       div.textContent = "❤️";
-    } else if (pickRandomCons.name === "itemGun") {
+    } else if (itemToSpawn.name === "itemGun") {
       div.textContent = "🔫";
     }
 
@@ -225,7 +235,6 @@ export const randomItemCreation = {
     // Remove the consumable after disappearSeconds * 2
     const disappearTimeout = setTimeout(() => {
         div.remove();
-        console.log(`${pickRandomCons.name} disappeared!`);
     }, gameState.timeManager.disappear * 2);
 
 
@@ -235,11 +244,9 @@ export const randomItemCreation = {
       clearTimeout(disappearTimeout);
 
       Effects.moveToSlotEffect(e.target);
-      console.log(`Picked up ${pickRandomCons.name} (+${pickRandomCons.value})`);
       div.remove();
     });
 
-    console.log(`Spawned ${pickRandomCons.name}`);
     
   },
 
@@ -254,4 +261,41 @@ export const randomItemCreation = {
       }
     });
   },
+};
+
+
+
+
+  function getHealthDropCooldownRemaining() {
+    const now = Date.now();
+    const healthItem = gameState.consumableItems.find(item => item.name === "itemGun");
+    if (!healthItem || !healthItem.lastHealthDropTime) return 0;
+
+   
+
+    const elapsed = now - healthItem.lastHealthDropTime;
+    const remaining = healthItem.healthDropCooldown - elapsed;
+    return remaining > 0 ? Math.ceil(remaining / 1000) : 0; // in seconds
+}
+
+// Update every 500ms
+
+function intervalOfCC(){
+setInterval(() => {
+    const remaining = getHealthDropCooldownRemaining();
+    const timerEl = document.getElementById("cooldownTimer");
+    if (!timerEl) return;
+
+    if (remaining > 0) {
+        timerEl.textContent = `❤️: ${remaining}s`;
+        timerEl.style.opacity = 1;
+    } else {
+        timerEl.textContent = "❤️ ready!";
+
+        setTimeout(()=>{
+          timerEl.style.opacity = 0;
+        },1000)
+    }
+}, 1500)
+
 };

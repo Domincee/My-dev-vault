@@ -1,12 +1,10 @@
 import { gameState } from "./gameState.js";
 import {Effects} from "./effect.js";
 import { itemCreation, UpdateUi,popUpNotif } from "./gameUI.js";
+import { effecItemtLogic } from "./effectItemLogic.js";
 
-const healthBarCon = document.querySelector('.health-bar-container');
-const HP = document.getElementById('healthBar');
 
 export const itemClicked = {
- hpAdded : 10,
 circle: (circle, color) => {
     let clicked = false;
     
@@ -19,13 +17,10 @@ circle: (circle, color) => {
 
         gameState.points++;
         gameState.currenthealth = Math.min(
-          gameState.currenthealth + itemClicked.hpAdded * gameState.multiplier.forHealth,
+          gameState.currenthealth + gameState.hpAdded * gameState.multiplier.forHealth,
           gameState.maxHealth
         );
 
-        Effects.showPoints(gameState.addPoints,"pts",color); //show popup points sides
-        Effects.showPoints(itemClicked.hpAdded,"❤️",color);
-        UpdateUi.ofScore(gameState.points); //update score
 
 
       } else if (color === "red") {
@@ -35,21 +30,19 @@ circle: (circle, color) => {
         );
 
         UpdateUi.ofCombo.remove();
-        Effects.showPoints(itemClicked.hpAdded,"❤️",color);
         gameState.comboState.comboCount = 0;
         gameState.comboState.comboTimer * 1000;
       }
 
        
     
-      UpdateUi.ofHealthBar(gameState.currenthealth, gameState.maxHealth);
+      UpdateUi.ofHealthBar(gameState.currenthealth, gameState.maxHealth,color);
       Effects.spawnParticles(e.offsetX, e.offsetY, circle.parentElement);
-      Effects.glowHealthBar(300, color,healthBarCon);
-      Effects.glowHealthBar(300, color, HP);
+   
 
       circle.remove();
 
-    /*    console.log("points " + gameState.points);
+    /* console.log("points " + gameState.points);
        console.log("health " + gameState.currenthealth) 
        console.log("combo "  + gameState.comboState.comboCount); */
     });
@@ -87,7 +80,8 @@ fireCombo: () => {
 
 export const depleteHP = {
   interevalDepletetimer: null, // initialize the timer
-
+  hpBelow50 : false,
+  
   start: (amount = 1, interval = 500) => {
     if (depleteHP.interevalDepletetimer) return; // prevent multiple intervals
 
@@ -95,6 +89,8 @@ export const depleteHP = {
       gameState.currenthealth = Math.max(gameState.currenthealth - amount, 0);
       UpdateUi.ofHealthBar(gameState.currenthealth, gameState.maxHealth);
       updateHighScore();
+
+  
       if (gameState.currenthealth <= 0) {
        /*  console.log("HP depleted!"); */
         popUpNotif.gameOver(gameState.points,gameState.highestPoints);
@@ -102,9 +98,20 @@ export const depleteHP = {
          depleteHP.stop();
          updateHighScore();
       }
-      
+
+      //check if hp is lessthan 50
+       if(gameState.currenthealth < 50){
+          if(depleteHP.hpBelow50) return;
+          depleteHP.hpBelow50 = true;
+          effecItemtLogic.dropingItemCondition.forHealth();//imported from effectItemlogic.js
+
+      } else {
+  // Reset the flag once HP is safe again
+        depleteHP.hpBelow50 = false;
+    }
     }, interval);
     
+       
   },
 
   stop: () => {
@@ -115,8 +122,11 @@ export const depleteHP = {
   }
 };
 
-export function updateHighScore (){
 
+
+
+
+export function updateHighScore (){
   if(gameState.points >  gameState.highestPoints){
     gameState.highestPoints = gameState.points;
     localStorage.setItem("highestScore",gameState.highestPoints);
@@ -133,6 +143,14 @@ export function restartGame(){
 
 /*  console.log("restarted game" + `health ${gameState.currenthealth}` +`points ${gameState.points}` )
  */
+
+
+    gameState.consumableItems.forEach((e)=>{
+        e.lastHealthDropTime = 0;
+        console.log(`${e.name} LHDT reverted to ${e.lastHealthDropTime} `);
+    });
+
+
     // 4. Restart game systems
     itemCreation.createItem();   // restart spawning circles
     depleteHP.start(2, 500); 

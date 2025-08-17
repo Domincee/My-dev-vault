@@ -4,8 +4,10 @@
         points: 0,
         highestPoints:  parseInt(localStorage.getItem("highestScore")) || 0,
         currenthealth: 100,
+        thresholdofPoints: 5,
         maxHealth:100,
         addPoints: 1,
+        hpAdded: 10,
         Odds: 0.7, //odds between blue and red = 0.7 blue gets high chance to be picked
 
         comboState: {
@@ -23,12 +25,14 @@
 
         timeManager:{
             delaySpawner: 1000, //1second
-            disappear: 1500, //1.5second
+            disappear: 1500,
+        
+             //1.5second
         },
        
         consumableItems: [
-            { name: "itemHealth", weight: 50, value: 100 },
-            { name: "itemGun", weight: 50, value: 10},
+            { name: "itemHealth",  value: 100 ,lastHealthDropTime: 0, healthDropCooldown: 40000},
+            { name: "itemGun",  value: 10,lastHealthDropTime: 0, healthDropCooldown: 50000},
         ],
 
         itemOnSlot: [

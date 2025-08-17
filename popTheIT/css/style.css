@@ -188,6 +188,7 @@ body {
 
 
 .notif-container{
+  z-index: 1000;
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -216,7 +217,6 @@ body {
   font-weight: bold;
   font-size: 1.5rem;
   color: var(--text-color);
-  font-family: 'Times New Roman', Times, serif;
   letter-spacing: 2px;
 }
 #retryButton{
@@ -226,6 +226,19 @@ body {
   letter-spacing: 2px;
   font-size: 1.5rem;
   background-color: var(--secondary-color);
+}
+
+#cooldownTimer{
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 15px;
+  font-size: 1.2rem;
+  color: var(--text-color);
+  z-index: 1000;
+  width: 20%;
+  opacity: 1;
+  animation: Scaler 1s ease-in-out infinite;
 }
 /* Mobile responsiveness */
 @media (max-width: 1200px) {
@@ -270,6 +283,11 @@ body {
   #retryButton{
   width: 50%;
 }
+#cooldownTimer {
+  width: 30%;
+  font-size: 1.5rem;
+}
+
 }
 
 #theme-select {

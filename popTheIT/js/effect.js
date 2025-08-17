@@ -1,3 +1,5 @@
+import { effecItemtLogic } from "./effectItemLogic.js";
+
 export const Effects = {
   spawnParticles(x, y, parent) {
     const numParticles = 24;
@@ -93,7 +95,7 @@ export const Effects = {
 
 
 
- glowHealthBar(duration = 300, color = "red",item) {
+ glowHealthBar(duration = 300,item) {
   if (!item) return;
 
   // Remove existing glow if any (prevents stacking)
@@ -101,7 +103,6 @@ export const Effects = {
   void item.offsetWidth; // force reflow
 
   // Apply glow
-  item.style.boxShadow = `0 0 15px ${color}, 0 0 5px 2px ${color}`;
   // Remove glow after duration
   setTimeout(() => {
     item.style.boxShadow = "";
@@ -135,7 +136,7 @@ export const Effects = {
         const dy = targetY - toMoverY;
 
         // smooth animation
-        itemToMove.style.transition = "transform 0.5s ease";
+        itemToMove.style.transition = "transform 0.2s ease";
         itemToMove.style.transform = `translate(${dx}px, ${dy}px)`;
 
         
@@ -143,12 +144,17 @@ export const Effects = {
           newItem.style.transform = "none"; // reset any transform
           emptySlot.appendChild(newItem);
 
-      newItem.addEventListener("click", () => {
-        console.log("Clicked once inside the inventory!");
-        console.log(newItem + newItem.dataset.item);
+        newItem.addEventListener("click", () => {
 
+         if (!emptySlot) {
+          console.log("No empty slots found.");
+           effecItemtLogic.heartEffect(newItem)
+          return;
+        }
+         effecItemtLogic.heartEffect(newItem);//call from logic
 
-        //add function for item effect!!
+         newItem.remove();//remove item 
+         emptySlot.classList.add("empty");//add empty class
       }, { once: true });
 
         // mark slot as filled

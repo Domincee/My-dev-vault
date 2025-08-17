@@ -32,7 +32,10 @@
 
     }
 
+    p{
+    font-family: 'Times New Roman', Times, serif;
 
+    }
 :root {
   --bg-color: #0c162a;
   --text-color: #876767;
@@ -68,7 +71,18 @@
  --box-border-color: #ff0000c0;
   --accent-color: #cc1f00;
   --hovered-color: #6784e7dc;
-    --circle-color: #e90303;
+     --circle-color: #6f02e3;
+
     --particle-color: #ff0707f2;
      --gameOver-color: #084781a7;
+}
+
+
+@keyframes Scaler {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.05);
+  }
 }
