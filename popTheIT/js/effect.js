@@ -109,58 +109,58 @@ export const Effects = {
   }, duration);
 },
 
-      moveToSlotEffect: (itemToMove) => {
-        const slots = document.querySelectorAll(".cons-item");
 
-        // find the first empty slot
-        const emptySlot = Array.from(slots).find(slot =>
-          slot.classList.contains("empty")
-        );
+moveToSlotEffect: (itemToMove) => {
+  const slots = document.querySelectorAll(".cons-item");
 
-        if (!emptySlot) {
-          console.log("No empty slots found.");
-          return;
-        }
+  // find the first empty slot
+  const emptySlot = Array.from(slots).find(slot =>
+    slot.classList.contains("empty")
+  );
 
-        // get bounding boxes
-        const toMove = itemToMove.getBoundingClientRect();
-        const target = emptySlot.getBoundingClientRect();
+  if (!emptySlot) {
+    // if all slot is occupied trigger it immediately
+   /*  console.log("No empty slots found. Using item directly..."); */
+    effecItemtLogic.heartEffect(itemToMove); // apply effect
+    itemToMove.remove(); // remove the dropped item from field
+    return;
+  }
 
-        const targetX = target.left + target.width / 2;
-        const targetY = target.top + target.height / 2;
+  // --- Normal behavior if a slot is free ---
+  const toMove = itemToMove.getBoundingClientRect();
+  const target = emptySlot.getBoundingClientRect();
 
-        const toMoverX = toMove.left + toMove.width / 2;
-        const toMoverY = toMove.top + toMove.height / 2;
+  const targetX = target.left + target.width / 2;
+  const targetY = target.top + target.height / 2;
 
-        const dx = targetX - toMoverX;
-        const dy = targetY - toMoverY;
+  const toMoverX = toMove.left + toMove.width / 2;
+  const toMoverY = toMove.top + toMove.height / 2;
 
-        // smooth animation
-        itemToMove.style.transition = "transform 0.2s ease";
-        itemToMove.style.transform = `translate(${dx}px, ${dy}px)`;
+  const dx = targetX - toMoverX;
+  const dy = targetY - toMoverY;
 
-        
-         const newItem = itemToMove.cloneNode(true);
-          newItem.style.transform = "none"; // reset any transform
-          emptySlot.appendChild(newItem);
+  // smooth animation
+  itemToMove.style.transition = "transform 0.2s ease";
+  itemToMove.style.transform = `translate(${dx}px, ${dy}px)`;
 
-        newItem.addEventListener("click", () => {
+  // cloning the item from box and put it on the "slot" cons-item
+  const newItem = itemToMove.cloneNode(true);
+  newItem.style.transform = "none";
+  emptySlot.appendChild(newItem);
 
-         if (!emptySlot) {
-          console.log("No empty slots found.");
-           effecItemtLogic.heartEffect(newItem)
-          return;
-        }
-         effecItemtLogic.heartEffect(newItem);//call from logic
+  newItem.addEventListener("click", () => {
+    effecItemtLogic.heartEffect(newItem); // apply effect when item from slot is clicked
+    newItem.remove(); // remove from slot
+    emptySlot.classList.add("empty"); // mark as free add class empty 
+  }, { once: true });
 
-         newItem.remove();//remove item 
-         emptySlot.classList.add("empty");//add empty class
-      }, { once: true });
+  // remove the class empty to mark it as filled means there's item
+  emptySlot.classList.remove("empty");
+  console.log(`Item moved to slot index ${[...slots].indexOf(emptySlot)} and marked as filled.`);
 
-        // mark slot as filled
-        emptySlot.classList.remove("empty");
-        console.log(`Item moved to slot index ${[...slots].indexOf(emptySlot)} and marked as filled.`);
-      },
+  itemToMove.remove();//removing it after all the things are done 
+},
+
           
 };
 

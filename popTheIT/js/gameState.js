@@ -31,8 +31,8 @@
         },
        
         consumableItems: [
-            { name: "itemHealth",  value: 100 ,lastHealthDropTime: 0, healthDropCooldown: 40000},
-            { name: "itemGun",  value: 10,lastHealthDropTime: 0, healthDropCooldown: 50000},
+            { name: "itemHealth",  value: 100 ,lastHealthDropTime: 0, healthDropCooldown: 5000},
+            { name: "itemGun",  value: 10,lastHealthDropTime: 0, healthDropCooldown: 5000},
         ],
 
         itemOnSlot: [

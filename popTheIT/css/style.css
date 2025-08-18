@@ -227,16 +227,18 @@ body {
   font-size: 1.5rem;
   background-color: var(--secondary-color);
 }
-
-#cooldownTimer{
+.cooldownTimerContainer{
   position: absolute;
+  display: flex;
+  flex-direction: column;
   top: 0;
+  width: fit-content;
+  justify-content: space-between;
   left: 0;
   margin: 15px;
   font-size: 1.2rem;
   color: var(--text-color);
   z-index: 1000;
-  width: 20%;
   opacity: 1;
   animation: Scaler 1s ease-in-out infinite;
 }
@@ -283,9 +285,8 @@ body {
   #retryButton{
   width: 50%;
 }
-#cooldownTimer {
-  width: 30%;
-  font-size: 1.5rem;
+.cooldownTimerContainer {
+  font-size: 0.7rem;
 }
 
 }

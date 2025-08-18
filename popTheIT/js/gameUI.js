@@ -264,38 +264,42 @@ export const randomItemCreation = {
 };
 
 
+function getCooldownRemaining(itemName) {
+  const now = Date.now();
+  const item = gameState.consumableItems.find(i => i.name === itemName);
+  if (!item || !item.lastHealthDropTime) return 0;
 
-
-  function getHealthDropCooldownRemaining() {
-    const now = Date.now();
-    const healthItem = gameState.consumableItems.find(item => item.name === "itemGun");
-    if (!healthItem || !healthItem.lastHealthDropTime) return 0;
-
-   
-
-    const elapsed = now - healthItem.lastHealthDropTime;
-    const remaining = healthItem.healthDropCooldown - elapsed;
-    return remaining > 0 ? Math.ceil(remaining / 1000) : 0; // in seconds
+  const elapsed = now - item.lastHealthDropTime;
+  const remaining = item.healthDropCooldown - elapsed;
+  return remaining > 0 ? Math.ceil(remaining / 1000) : 0; // in seconds
 }
 
 // Update every 500ms
+function intervalOfCC() {
+  setInterval(() => {
+    const gunRemaining = getCooldownRemaining("itemGun");
+    const healthRemaining = getCooldownRemaining("itemHealth");
 
-function intervalOfCC(){
-setInterval(() => {
-    const remaining = getHealthDropCooldownRemaining();
-    const timerEl = document.getElementById("cooldownTimer");
-    if (!timerEl) return;
+    const gunTimerEl = document.getElementById("cooldownGun");
+    const healthTimerEl = document.getElementById("cooldownHealth");
 
-    if (remaining > 0) {
-        timerEl.textContent = `❤️: ${remaining}s`;
-        timerEl.style.opacity = 1;
-    } else {
-        timerEl.textContent = "❤️ ready!";
+    if (gunTimerEl) {
+      if (gunRemaining > 0) {
+        gunTimerEl.textContent = `🔫: ${gunRemaining}s`;
+        
+      } else {
+        gunTimerEl.textContent = "🔫 ready!";
 
-        setTimeout(()=>{
-          timerEl.style.opacity = 0;
-        },1000)
+      }
     }
-}, 1500)
 
-};
+    if (healthTimerEl) {
+      if (healthRemaining > 0) {
+        healthTimerEl.textContent = `❤️: ${healthRemaining}s`;
+        
+      } else {
+        healthTimerEl.textContent = "❤️ ready!";
+      }
+    }
+  }, 500);
+}
