@@ -86,3 +86,12 @@
     transform: scale(1.05);
   }
 }
+
+
+#boss, img {
+  -webkit-user-drag: none; /* Safari/Chrome */
+  -khtml-user-drag: none;  /* Konqueror */
+  -moz-user-drag: none;    /* Firefox */
+  -o-user-drag: none;      /* Opera */
+  pointer-events: auto;    /* keep clicks working */
+}

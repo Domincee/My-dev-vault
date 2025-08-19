@@ -1,6 +1,6 @@
 import { gameState } from "./gameState.js";
 import {Effects} from "./effect.js";
-import { itemCreation, UpdateUi,popUpNotif } from "./gameUI.js";
+import { itemCreation, UpdateUi,popUpNotif, BossPhase, generateGrid } from "./gameUI.js";
 import { effecItemtLogic } from "./effectItemLogic.js";
 
 
@@ -13,15 +13,20 @@ circle: (circle, color) => {
       if (clicked) return;
       clicked = true;
       if (color === "blue") {
+
         counterCombo.fireCombo(color);
 
         gameState.points++;
         gameState.currenthealth = Math.min(
-          gameState.currenthealth + gameState.hpAdded * gameState.multiplier.forHealth,
-          gameState.maxHealth
+        gameState.currenthealth + gameState.hpAdded * gameState.multiplier.forHealth,
+        gameState.maxHealth
         );
 
 
+       if ( gameState.points >= gameState.boss.pointsThresholdForBossSpawn && !BossPhase.active) {
+        BossPhase.start();
+      }
+      console.log(gameState.item);
 
       } else if (color === "red") {
         gameState.currenthealth = Math.max(
@@ -37,8 +42,7 @@ circle: (circle, color) => {
        
     
       UpdateUi.ofHealthBar(gameState.currenthealth, gameState.maxHealth,color);
-      Effects.spawnParticles(e.offsetX, e.offsetY, circle.parentElement);
-   
+     Effects.spawnParticles(e.offsetX, e.offsetY, document.body);
 
       circle.remove();
 
@@ -85,7 +89,7 @@ export const depleteHP = {
   start: (amount = 1, interval = 500) => {
     if (depleteHP.interevalDepletetimer) return; // prevent multiple intervals
 
-    depleteHP.interevalDepletetimer = setInterval(() => {
+      depleteHP.interevalDepletetimer = setInterval(() => {
       gameState.currenthealth = Math.max(gameState.currenthealth - amount, 0);
       UpdateUi.ofHealthBar(gameState.currenthealth, gameState.maxHealth);
       updateHighScore();
@@ -134,6 +138,8 @@ export function updateHighScore (){
 }
 
 export function restartGame(){
+    gameState.item = 100;//generate back to 100 items 
+    generateGrid(gameState.item);
     gameState.currenthealth = gameState.maxHealth;
     gameState.points = 0;
     gameState.comboState.comboCount = 0;

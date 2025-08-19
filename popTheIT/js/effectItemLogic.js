@@ -18,6 +18,9 @@ export const effecItemtLogic = {
                 console.log("gun");
                 const boxes = document.querySelectorAll(".boxes");
 
+                  if(gameState.boss.bossActive){
+                    console.log("boss active and gun clicked");
+                  }
 
                 // Repeat every 1 second
                  effecItemtLogic.interval = setInterval(() => {
@@ -58,9 +61,10 @@ export const effecItemtLogic = {
     },
 
 
-
 dropingItemCondition: {
   forHealth: () => {
+    if (!gameState.dropEnabled) return; // stop if disabled ✅
+
     const minHealthDrop = 50;
 
     if (gameState.currenthealth <= minHealthDrop) {
@@ -72,38 +76,46 @@ dropingItemCondition: {
             randomItemCreation.spawnConsumableItem(item);
             item.lastHealthDropTime = now;
 
-            console.log(`succesfuly get ${item.name}`)
-
+            console.log(`succesfuly get ${item.name}`);
           }
         }
       });
     }
   },
-forGun: () => {
-    let increaseThresHold = 10; // integer multiplier
 
-     const itemGun = gameState.consumableItems.find(item => item.name === "itemGun");
+  forGun: () => {
+    if (!gameState.dropEnabled) return; // stop if disabled ✅
+
+    let increaseThresHold = 5; 
+
+    const itemGun = gameState.consumableItems.find(item => item.name === "itemGun");
     if (gameState.points > gameState.thresholdofPoints) {
       const now = Date.now();
 
-         if (!itemGun.lastHealthDropTime || now - itemGun.lastHealthDropTime >= itemGun.healthDropCooldown) {
-             randomItemCreation.spawnConsumableItem(itemGun);
-            itemGun.lastHealthDropTime = now;
-            console.log(`succesfuly get ${itemGun.name}`)
+      if (!itemGun.lastHealthDropTime || now - itemGun.lastHealthDropTime >= itemGun.healthDropCooldown) {
+        randomItemCreation.spawnConsumableItem(itemGun);
+        itemGun.lastHealthDropTime = now;
+        console.log(`succesfuly get ${itemGun.name}`);
+      }
 
-          }
-
-
-        console.log("Respawning GUN");
-        // Update threshold after respawn so next check is harder
-         gameState.thresholdofPoints = Math.floor( gameState.thresholdofPoints + increaseThresHold);// stays integer
-        console.log("New threshold:",  gameState.thresholdofPoints);
+      console.log("Respawning GUN");
+      gameState.thresholdofPoints = Math.floor(gameState.thresholdofPoints + increaseThresHold);
+      console.log("New threshold:", gameState.thresholdofPoints);
     }
-}
-}
-//call where it updates score
+  },
 
-} 
+  stopDropping: () => {
+    gameState.dropEnabled = false;
+    console.log("Consumable drops stopped.");
+  },
+
+  startDropping: () => {
+    gameState.dropEnabled = true;
+    console.log("Consumable drops resumed.");
+  }
+}
+
+}
 
 
 

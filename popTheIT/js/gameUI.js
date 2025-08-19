@@ -2,7 +2,7 @@ import { gameState } from "./gameState.js";
 import {
   itemClicked,
   restartGame,
-  pickRandomConsumableItem,
+  depleteHP,
 } from "./gameLogic.js";
 import { Effects } from "./effect.js";
 import { effecItemtLogic } from "./effectItemLogic.js";
@@ -33,6 +33,7 @@ export const ThemeManager = {
 };
 
 export function generateGrid(item) {
+    grid.innerHTML = "";
   for (let i = 0; i < item; i++) {
     const box = document.createElement("div");
     box.className = "boxes";
@@ -87,6 +88,8 @@ export const itemCreation = {
     return;
   },
 
+
+
   stopSpawning: () => {
     const circle = document.querySelectorAll(".circle");
 
@@ -119,6 +122,137 @@ export const itemCreation = {
   },
 };
 
+
+export const BossPhase = {
+
+start() {
+  gameState.boss.bossActive = true;
+  
+  effecItemtLogic.dropingItemCondition.stopDropping();
+  gameState.item = 1; // only spawn 1 (the boss)
+  generateGrid(gameState.item);
+  gameState.boss.currentHp = gameState.boss.maxHealth;
+  const box = document.querySelector(".boxes");
+
+  const bossContainer = document.createElement('div');
+  bossContainer.className = "bossContainer"; // hidden state
+
+  const boss = document.createElement("img");
+  boss.className = "boss";
+  boss.id = "boss";
+
+  const bossHealthBarCon = document.createElement('div');
+  const bosseHealthbarFill = document.createElement('div');
+
+  bossHealthBarCon.className = "bossHealthBarCon";
+  bosseHealthbarFill.className = "bosseHealthbarFill";
+  bosseHealthbarFill.id = "bossHealthBarFill";
+
+  bossContainer.appendChild(bossHealthBarCon);
+  bossHealthBarCon.appendChild(bosseHealthbarFill);
+  bossContainer.appendChild(boss);
+
+  box.appendChild(bossContainer);
+
+  itemCreation.resetBoxes();
+  itemCreation.stopSpawning();
+  depleteHP.stop();
+
+  console.log("Boss spawned!");
+  const bossText = document.createElement("div");
+  bossText.className = "boss-appeared-text";
+  bossText.innerText = "BOSS APPEARED!";
+  document.body.appendChild(bossText);
+
+
+    boss.id = "boss";
+    boss.src = "assets/bossRoy.png"; // default image
+
+    boss.addEventListener("click", () => {
+    BossPhase.takeDamage(5 * gameState.boss.healthBossMultply);
+    const bossDamageTaken = 5 * gameState.boss.healthBossMultply;
+
+    Effects.showPoints(bossDamageTaken,"❤️","red");
+
+    console.log("Boss clicked! Current HP: " + gameState.boss.currentHp);
+    boss.src = "assets/bossRoyhurt.png"; // change to hurt version
+    boss.classList.add("boss-hurt");
+
+    // reset back after 0.3s  
+    setTimeout(() => {
+    boss.src = "assets/bossRoy.png";
+    boss.classList.remove("boss-hurt");
+    }, 300);
+    });
+  // Remove after animation ends
+  setTimeout(() => {
+    bossText.remove();
+  }, 5000);
+
+  // 🔹 Trigger animation after a short delay
+  setTimeout(() => {
+    bossContainer.classList.add("show");
+  }, 50);
+
+  // 🔹 Sync HP depletion to start after slide (3s)
+  setTimeout(() => {
+    depleteHP.start(20, 500); 
+    console.log("Boss HP depletion started!");
+  }, 5000);
+},
+
+  takeDamage(amount) {
+    gameState.boss.currentHp = Math.max(gameState.boss.currentHp - amount, 0);
+    const bossHealthBarFill = document.getElementById("bossHealthBarFill");
+
+      if (bossHealthBarFill) {
+        const percent = (gameState.boss.currentHp / gameState.boss.maxHealth) * 100;
+        bossHealthBarFill.style.width = `${percent}%`;
+
+        // Flash effect
+        bossHealthBarFill.classList.add("damage-flash");
+        setTimeout(() => bossHealthBarFill.classList.remove("damage-flash"), 300);
+      }
+
+   let defeated = false  
+   if (gameState.boss.currentHp <= 0 && !defeated) {
+    
+    defeated = true
+    const defeatText = document.createElement("div");
+    defeatText.className = "boss-defeated-text";
+    defeatText.innerText = "BOSS DEFEATED!";
+    document.body.appendChild(defeatText);
+    this.end();
+
+    // remove after 3s
+    setTimeout(() => {
+      defeatText.remove();
+
+      // call end() after text disappears
+
+      // resume normal spawning
+
+    }, 3000);
+  }
+  },
+
+  end() {
+  gameState.boss.bossActive = false;
+    gameState.item = 100;   
+    gameState.boss.pointsThresholdForBossSpawn += 3;
+    generateGrid(gameState.item);// restore normal
+
+    const boss = document.getElementById("boss");
+    if (boss) boss.remove();
+    console.log("Boss defeated! Back to normal phase.");
+    depleteHP.stop();
+    depleteHP.start(10, 1000); // restore normal depletion
+    itemCreation.createItem(); // resume item creation
+
+  }
+};
+
+
 const scoreBoard = document.getElementById("scoreboard");
 const comboText = document.getElementById("comboCount");
 const healthBar = document.getElementById("healthBar");
@@ -129,6 +263,7 @@ export const UpdateUi = {
   ofScore: (points) => {
     scoreBoard.textContent = `Score: ${points}`;
     effecItemtLogic.dropingItemCondition.forGun();
+
   },
 
   ofCombo: {

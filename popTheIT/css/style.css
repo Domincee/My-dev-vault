@@ -242,6 +242,27 @@ body {
   opacity: 1;
   animation: Scaler 1s ease-in-out infinite;
 }
+
+.bossContainer{
+  padding: 10px;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  background-color: none;
+ gap: 5px;
+}
+.bossHealthBarCon{
+  width: 80%;
+  height: 10px;
+  
+  background-color: rgba(123, 123, 123, 0.37);
+  border: 2px solid blue;
+}
 /* Mobile responsiveness */
 @media (max-width: 1200px) {
   .cons-item {

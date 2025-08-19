@@ -27,3 +27,68 @@
     box-shadow: 0 0 2px 2px rgb(69, 69, 255);
 
     }
+
+    
+    .boss{
+     background-color: var(--circle-color);
+      width: 100%;
+      aspect-ratio: 1 / 1; /* Ensures it's always a square */
+      transition: all 0.3s ease-in-out;
+      border-radius: 8px;
+      position: relative;
+    }
+
+
+
+    .bossContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;                     /* start invisible */
+  transform: translateY(-200px);  /* start above */
+  transition: transform 3s ease, opacity 3s ease;
+}
+
+.bossContainer.show {
+  opacity: 1;                     
+  transform: translateY(0);       /* slide down to final spot */
+}
+
+/* Example styling for boss */
+.boss {
+  width: 540px;   /* set your desired boss size */
+  height: auto;   /* keeps aspect ratio */
+  object-fit: contain; /* make sure whole image is visible */
+  display: block;
+  background: transparent;
+}
+/* Boss HP bar container */
+.bossHealthBarCon {
+  width: 150px;
+  height: 20px;
+  border: 2px solid #000;
+  border-radius: 10px;
+  margin-bottom: 10px;  
+  overflow: hidden;
+}
+
+/* HP fill */
+.bosseHealthbarFill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, #48ed4b, #f51515);
+  transition: width 0.3s linear;
+  box-shadow: 0 0 10px rgba(70, 67, 237, 0.8);
+}
+
+
+.bosseHealthbarFill.damage-flash {
+  animation: flashRed 0.3s ease;
+}
+
+@keyframes flashRed {
+  0% { background: #ff0000; }
+  50% { background: #0b24e2e7; }
+  100% { background: #ff0000; }
+}
