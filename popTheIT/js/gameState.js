@@ -6,7 +6,6 @@
 
         highestPoints:  parseInt(localStorage.getItem("highestScore")) || 0,
         currenthealth: 100,
-        thresholdofPoints: 3,
         maxHealth:100,
         addPoints: 1,
         hpAdded: 10,
@@ -18,10 +17,11 @@
               comboTimer: 3,
               comboTimeout: null, 
         },
+
         multiplier: {
               forHealth:1.5,
               forPoints:1.5,
-              forDamage:1.5,
+              forDamage:2,
 
         },
 
@@ -30,8 +30,9 @@
             maxHealth:100,
             currentHp:100,
             healthBossMultply :1,
-            pointsThresholdForBossSpawn: 6,
-
+            pointsThresholdForBossSpawn: 5,
+            bossPoints:10,
+            damageToBoss: 2, //decrease for higher boss level
 
         },
 
@@ -43,8 +44,8 @@
         },
        
         consumableItems: [
-            { name: "itemHealth",  value: 100 ,lastHealthDropTime: 0, healthDropCooldown: 5000},
-            { name: "itemGun",  value: 10,lastHealthDropTime: 0, healthDropCooldown: 5000},
+            { name: "itemHealth",  value: 100 ,lastHealthDropTime: 0, healthDropCooldown: 10000, },
+            { name: "itemGun",  value: 10,lastHealthDropTime: 0, healthDropCooldown: 15000, duration: 10000, thresholdSpawnGun:10,multipltyThresholdBy:2}, // 10 seconds
         ],
 
         itemOnSlot: [

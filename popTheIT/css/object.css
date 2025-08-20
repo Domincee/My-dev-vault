@@ -65,7 +65,7 @@
 }
 /* Boss HP bar container */
 .bossHealthBarCon {
-  width: 150px;
+  width: 100px;
   height: 20px;
   border: 2px solid #000;
   border-radius: 10px;
@@ -91,4 +91,14 @@
   0% { background: #ff0000; }
   50% { background: #0b24e2e7; }
   100% { background: #ff0000; }
+}
+
+
+
+@media (max-width: 1200px) {
+
+    .boss {
+      width: 240px;
+    }
+
 }

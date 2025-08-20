@@ -1,68 +1,35 @@
 import { gameState } from "./gameState.js";
-import { UpdateUi, randomItemCreation } from "./gameUI.js";
+import { UpdateUi, randomItemCreation,BossPhase } from "./gameUI.js";
 import { Effects } from "./effect.js";
 
 
-
 export const effecItemtLogic = {
-    interval : null,
-    heartEffect(newItem){
-
-        if(newItem.dataset.item ==="itemHealth"){
-        gameState.currenthealth = 100;
-
-        UpdateUi.ofHealthBar(gameState.currenthealth, gameState.maxHealth, "blue")
+    heartEffect: (newItem) => {
+        if (newItem.dataset.item === "itemHealth") {
+            gameState.currenthealth = 100;
+            Effects.heartEffect();
+            UpdateUi.ofHealthBar(gameState.currenthealth, gameState.maxHealth, "blue");
         }
 
-                if (newItem.dataset.item === "itemGun") {
-                console.log("gun");
-                const boxes = document.querySelectorAll(".boxes");
+        if (newItem.dataset.item === "itemGun") {
+            console.log("gun");
 
-                  if(gameState.boss.bossActive){
-                    console.log("boss active and gun clicked");
-                  }
+            // ✅ Start the gun effect damage loop
+            GunBossDamage.start();
 
-                // Repeat every 1 second
-                 effecItemtLogic.interval = setInterval(() => {
-                    //filter that box have a child of blue 
-                    const availableBoxes = Array.from(boxes).filter(
-                        (box) => box.querySelector(".blue")
-                    );
-                    
-                    availableBoxes.forEach((box) => {
-                        const blueItem = box.querySelector(".blue");
-                        gameState.points++; 
-                        gameState.currenthealth = Math.min(
-                        gameState.currenthealth + gameState.hpAdded * gameState.multiplier.forHealth,
-                        gameState.maxHealth
-                        );
-                        if (blueItem) blueItem.remove();
-                        console.log(gameState.currenthealth);
-                        UpdateUi.ofHealthBar(gameState.currenthealth,gameState.maxHealth,"blue");
-                    });
+            // ✅ Stop it after 10s
+            setTimeout(() => {
+                GunBossDamage.stop();
+                console.log("Gun effect stopped!");
+            }, gameState.consumableItems[1].duration);
+        }
 
-                }, gameState.timeManager.delaySpawner); 
-
-                // Stop after N seconds
-                effecItemtLogic.stopEffect();
-               // stop after 10 seconds
-            }
-            
-              UpdateUi.ofHealthBar(gameState.currenthealth, gameState.maxHealth);
-        //show popup points sides
-        
+        Effects.spawnParticles(newItem.offsetLeft, newItem.offsetTop, document.body);
+        UpdateUi.ofHealthBar(gameState.currenthealth, gameState.maxHealth);
     },
 
-    stopEffect(){
-          setTimeout(() => {
-                    clearInterval(effecItemtLogic.interval);
-                    console.log("Stopped checking!");
-         }, 10000);
-    },
-
-
-dropingItemCondition: {
-  forHealth: () => {
+    dropingItemCondition: {
+        forHealth: () => {
     if (!gameState.dropEnabled) return; // stop if disabled ✅
 
     const minHealthDrop = 50;
@@ -86,10 +53,9 @@ dropingItemCondition: {
   forGun: () => {
     if (!gameState.dropEnabled) return; // stop if disabled ✅
 
-    let increaseThresHold = 5; 
-
+    console.log(gameState.consumableItems[1].thresholdSpawnGun);
     const itemGun = gameState.consumableItems.find(item => item.name === "itemGun");
-    if (gameState.points > gameState.thresholdofPoints) {
+    if (gameState.points > gameState.thresholdofPointsForGun) {
       const now = Date.now();
 
       if (!itemGun.lastHealthDropTime || now - itemGun.lastHealthDropTime >= itemGun.healthDropCooldown) {
@@ -99,8 +65,10 @@ dropingItemCondition: {
       }
 
       console.log("Respawning GUN");
-      gameState.thresholdofPoints = Math.floor(gameState.thresholdofPoints + increaseThresHold);
-      console.log("New threshold:", gameState.thresholdofPoints);
+     
+
+
+      console.log("New threshold:", gameState.consumableItems[1].thresholdSpawnGun);
     }
   },
 
@@ -119,3 +87,67 @@ dropingItemCondition: {
 
 
 
+export const GunBossDamage = {
+  interval: null,
+
+  start: () => {
+    if (GunBossDamage.interval) return; // prevent double start
+
+    GunBossDamage.interval = setInterval(() => {
+      // Case 1: .blue exists → normal logic
+      const boxes = document.querySelectorAll(".boxes");
+      const availableBoxes = Array.from(boxes).filter(
+        (box) => box.querySelector(".blue")
+      );
+
+      if (availableBoxes.length > 0) {
+        availableBoxes.forEach((box) => {
+          const blueItem = box.querySelector(".blue");
+          if (!blueItem) return;
+
+          gameState.points = Math.floor(
+            gameState.points + gameState.addPoints * gameState.multiplier.forPoints
+          ); 
+
+
+          gameState.currenthealth = Math.min(
+          gameState.currenthealth + gameState.hpAdded * gameState.multiplier.forHealth,
+          gameState.maxHealth
+          );//increase health
+
+          // Boss damage
+          if (gameState.boss.bossActive) {
+            BossPhase.takeDamage(gameState.boss.damageToBoss );
+            Effects.showPoints(gameState.boss, "💥", "red");
+            UpdateUi.ofBossHealthBar(gameState.boss.currentHp, gameState.boss.maxHp, "red");
+          }
+
+          Effects.gunEffect(blueItem);
+
+          if(gameState.points >= gameState.boss.pointsThresholdForBossSpawn ) {
+            console.log("gun spawn condition met!");
+          }
+    /*       effecItemtLogic.dropingItemCondition.forGun(); */
+
+          Effects.showPoints(gameState.points, "pts", "blue");  
+          Effects.showPoints(gameState.hpAdded, "❤️", "blue");
+          UpdateUi.ofHealthBar(gameState.currenthealth, gameState.maxHealth, "blue");
+        });
+      } 
+      // Case 2: No .blue but boss active → auto damage tick
+      else if (gameState.boss.bossActive) {
+        BossPhase.takeDamage(10 * gameState.multiplier.forDamage);
+        Effects.showPoints(10 * gameState.multiplier.forDamage, "💥", "red");
+        UpdateUi.ofBossHealthBar(gameState.boss.currentHp, gameState.boss.maxHp, "red");
+        console.log(`Auto damage to boss: ${10 * gameState.multiplier.forDamage}, Boss HP: ${gameState.boss.currentHp}`);
+      }
+    }, gameState.timeManager.delaySpawner);
+  },
+
+  stop: () => {
+    if (GunBossDamage.interval) {
+      clearInterval(GunBossDamage.interval);
+      GunBossDamage.interval = null;
+    }
+  }
+};

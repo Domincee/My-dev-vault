@@ -39,7 +39,8 @@ export function generateGrid(item) {
     box.className = "boxes";
 
     grid.appendChild(box);
-    UpdateUi.ofHealthBar();
+    UpdateUi.ofHealthBar(gameState.currenthealth, gameState.maxHealth);
+
   }
 
   const size = Math.ceil(Math.sqrt(item));
@@ -164,10 +165,15 @@ start() {
   bossText.innerText = "BOSS APPEARED!";
   document.body.appendChild(bossText);
 
+  
+
 
     boss.id = "boss";
     boss.src = "assets/bossRoy.png"; // default image
+  setTimeout(() => {
+    bossText.remove();
 
+    
     boss.addEventListener("click", () => {
     BossPhase.takeDamage(5 * gameState.boss.healthBossMultply);
     const bossDamageTaken = 5 * gameState.boss.healthBossMultply;
@@ -184,20 +190,25 @@ start() {
     boss.classList.remove("boss-hurt");
     }, 300);
     });
-  // Remove after animation ends
-  setTimeout(() => {
-    bossText.remove();
   }, 5000);
 
   // 🔹 Trigger animation after a short delay
   setTimeout(() => {
     bossContainer.classList.add("show");
+    boss.classList.add("move");
   }, 50);
 
   // 🔹 Sync HP depletion to start after slide (3s)
   setTimeout(() => {
-    depleteHP.start(20, 500); 
+    depleteHP.start(10, 500); 
     console.log("Boss HP depletion started!");
+
+    if( gameState.boss.currentHp <= 0) {
+      popUpNotif.gameOver(gameState.points,gameState.highestPoints);
+      BossPhase.end();
+    }
+    boss.classList.remove("move");
+    boss.classList.add("idle");
   }, 5000);
 },
 
@@ -238,6 +249,8 @@ start() {
 
   end() {
   gameState.boss.bossActive = false;
+    gameState.currenthealth = 100;
+    gameState.points += gameState.boss.bossPoints;
     gameState.item = 100;   
     gameState.boss.pointsThresholdForBossSpawn += 3;
     generateGrid(gameState.item);// restore normal
@@ -248,6 +261,8 @@ start() {
     depleteHP.stop();
     depleteHP.start(10, 1000); // restore normal depletion
     itemCreation.createItem(); // resume item creation
+    UpdateUi.ofScore(gameState.points);
+    UpdateUi.ofHealthBar(gameState.currenthealth, gameState.maxHealth);
 
   }
 };
@@ -262,7 +277,6 @@ const HP = document.getElementById('healthBar');
 export const UpdateUi = {
   ofScore: (points) => {
     scoreBoard.textContent = `Score: ${points}`;
-    effecItemtLogic.dropingItemCondition.forGun();
 
   },
 
@@ -277,12 +291,11 @@ export const UpdateUi = {
     },
   },
 
-  ofHealthBar: (currenthealth, maxHeath,color) => {
+  ofHealthBar: (currenthealth, maxHeath) => {
     const percent = (currenthealth / maxHeath) * 100;
         healthBar.style.width = `${Math.max(percent, 0)}%`;
-        Effects.showPoints(gameState.hpAdded,"❤️",color);
         UpdateUi.ofScore(gameState.points); 
-        Effects.showPoints(gameState.addPoints,"pts",color); 
+
   },
 };
 

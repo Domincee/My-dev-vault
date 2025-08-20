@@ -1,7 +1,7 @@
 import { gameState } from "./gameState.js";
 import {Effects} from "./effect.js";
 import { itemCreation, UpdateUi,popUpNotif, BossPhase, generateGrid } from "./gameUI.js";
-import { effecItemtLogic } from "./effectItemLogic.js";
+import { effecItemtLogic, GunBossDamage } from "./effectItemLogic.js";
 
 
 export const itemClicked = {
@@ -12,10 +12,10 @@ circle: (circle, color) => {
       e.stopImmediatePropagation();
       if (clicked) return;
       clicked = true;
+
       if (color === "blue") {
 
         counterCombo.fireCombo(color);
-
         gameState.points++;
         gameState.currenthealth = Math.min(
         gameState.currenthealth + gameState.hpAdded * gameState.multiplier.forHealth,
@@ -23,17 +23,21 @@ circle: (circle, color) => {
         );
 
 
-       if ( gameState.points >= gameState.boss.pointsThresholdForBossSpawn && !BossPhase.active) {
-        BossPhase.start();
-      }
-      console.log(gameState.item);
+        effecItemtLogic.dropingItemCondition.forGun();
+        if ( gameState.points > gameState.boss.pointsThresholdForBossSpawn) {
+              console.log("Boss spawn condition met!");
+              console.log(gameState.boss.pointsThresholdForBossSpawn);
+              BossPhase.start();
+          } 
+  
 
       } else if (color === "red") {
         gameState.currenthealth = Math.max(
           gameState.currenthealth - 10 * gameState.multiplier.forDamage,
           0
-        );
+        );  
 
+        
         UpdateUi.ofCombo.remove();
         gameState.comboState.comboCount = 0;
         gameState.comboState.comboTimer * 1000;
@@ -44,6 +48,8 @@ circle: (circle, color) => {
       UpdateUi.ofHealthBar(gameState.currenthealth, gameState.maxHealth,color);
      Effects.spawnParticles(e.offsetX, e.offsetY, document.body);
 
+        Effects.showPoints(gameState.hpAdded,"❤️",color);
+        Effects.showPoints(gameState.addPoints,"pts",color); 
       circle.remove();
 
     /* console.log("points " + gameState.points);
@@ -96,6 +102,11 @@ export const depleteHP = {
 
   
       if (gameState.currenthealth <= 0) {
+
+        gameState.consumableItems[1].thresholdSpawnGun = 10;
+        gameState.boss.pointsThresholdForBossSpawn = 20;
+        console.log(gameState);
+        GunBossDamage.stop
        /*  console.log("HP depleted!"); */
         popUpNotif.gameOver(gameState.points,gameState.highestPoints);
          itemCreation.stopSpawning();

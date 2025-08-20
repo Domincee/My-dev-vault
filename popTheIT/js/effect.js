@@ -68,7 +68,7 @@ export const Effects = {
     text.style.top = `${randomY}px`;
 
     // remove after animation
-    setTimeout(() => text.remove(), 2000);
+    setTimeout(() => text.remove(), 500);
   },
 
   shakeElement(el) {
@@ -161,6 +161,51 @@ moveToSlotEffect: (itemToMove) => {
   itemToMove.remove();//removing it after all the things are done 
 },
 
+  heartEffect: () => {
+  const container = document.createElement("div");
+  container.className = "container-heart";
+  document.body.appendChild(container);
+
+  for (let i = 0; i < 20; i++) {
+    const heart = document.createElement("div");
+    heart.className = "heart";
+    heart.innerHTML = "❤️";
+
+    heart.style.left = Math.random() * window.innerWidth + "px";
+    heart.style.animationDelay = (i * 0.1) + "s";
+    console.log("heart effect");
+    container.appendChild(heart);
+
+    setTimeout(() => {
+      heart.remove();
+      if (container.children.length === 0) {
+        container.remove(); // clean container after all hearts gone
+      }
+    }, 3000 + (i * 200)); // delay matches animation + stagger
+  }
+},
+
+gunEffect: (blueItem) => {
+  if (!blueItem) return;
+
+  // Get the position of the .blue item
+  const rect = blueItem.getBoundingClientRect();
+  const crosshair = document.createElement("div");
+  crosshair.className = "crosshair-effect";
+
+  // Center the crosshair on the .blue element
+  const size = 50; // match CSS size
+  crosshair.style.left = rect.left + rect.width / 2 - size / 2 + "px";
+  crosshair.style.top = rect.top + rect.height / 2 - size / 2 + "px";
+  document.body.appendChild(crosshair);
+
+  // Remove crosshair after animation
+  setTimeout(() => {
+    crosshair.remove();
+    // Remove the blue item AFTER the crosshair finishes
+    blueItem.remove();
+  }, 400); // match CSS animation duration
+},
           
 };
 

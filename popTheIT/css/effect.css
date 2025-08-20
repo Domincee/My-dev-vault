@@ -23,32 +23,11 @@
 }
 
 
-@keyframes popUp {
-  0% {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-  30% {
-    transform: scale(1.2);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0;
-  }
-}
 
 .healthBarCon.ShakeEffect {
   animation: shake 0.3s;
 }
 
-@keyframes shake {
-  0%   { transform: rotate(0deg); }
-  25%  { transform: rotate(-10deg); }
-  50%  { transform: rotate(8deg); }
-  75%  { transform: rotate(-10deg); }
-  100% { transform: rotate(0deg); }
-}
 
 
 .boss-appeared-text {
@@ -72,32 +51,6 @@
   text-align: center;
 }
 
-@keyframes bossAppearEpic {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.5) rotate(-5deg);
-    filter: blur(5px);
-  }
-  20% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.3) rotate(2deg);
-    filter: blur(0);
-  }
-  40% {
-    transform: translate(-50%, -50%) scale(1) rotate(-2deg);
-  }
-  60% {
-    transform: translate(-50%, -50%) scale(1.2) rotate(1deg);
-  }
-  80% {
-    transform: translate(-50%, -50%) scale(1) rotate(-1deg);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.8);
-    filter: blur(1px);
-  }
-}
 
 
 .boss-hurt {
@@ -118,8 +71,36 @@
   animation: fadeOut 3s forwards;
 }
 
-@keyframes fadeOut {
-  0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  50%  { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+
+.container-heart {
+  position: fixed;
+  bottom: -30px;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 9999; /* make sure it's above your game */
 }
+
+.heart {
+  position: absolute;
+  font-size: 24px;
+  bottom: 0;
+  color: red;
+  animation: floatUp 3s ease forwards;
+  opacity: 0.9;
+}
+
+
+
+.crosshair-effect {
+  position: absolute;
+  width: 40px; /* size of crosshair */
+  height: 40px;
+  pointer-events: none;
+  background: url("../assets/crosshair.png") no-repeat center/contain; /* your PNG */
+  animation: crosshairAnim 0.4s ease-out forwards;
+  z-index: 1000;
+}
+
