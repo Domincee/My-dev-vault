@@ -21,17 +21,18 @@ circle: (circle, color) => {
         gameState.currenthealth + gameState.hpAdded * gameState.multiplier.forHealth,
         gameState.maxHealth
         );
+        pointersHealers();
 
+        effecItemtLogic.dropingItemCondition.forGun();//condition for spawning gun if points higher that threshold guns pawn
 
-        effecItemtLogic.dropingItemCondition.forGun();
-        if ( gameState.points > gameState.boss.pointsThresholdForBossSpawn) {
+        if ( gameState.points > gameState.threshold.forBossSpawn) { //checking first for boos spawn
               console.log("Boss spawn condition met!");
               console.log(gameState.boss.pointsThresholdForBossSpawn);
               BossPhase.start();
           } 
   
 
-      } else if (color === "red") {
+      } else if (color === "red") { 
         gameState.currenthealth = Math.max(
           gameState.currenthealth - 10 * gameState.multiplier.forDamage,
           0
@@ -46,7 +47,7 @@ circle: (circle, color) => {
        
     
       UpdateUi.ofHealthBar(gameState.currenthealth, gameState.maxHealth,color);
-     Effects.spawnParticles(e.offsetX, e.offsetY, document.body);
+       Effects.spawnParticles(e.pageX, e.pageY, document.body, color);
 
         Effects.showPoints(gameState.hpAdded,"❤️",color);
         Effects.showPoints(gameState.addPoints,"pts",color); 
@@ -187,3 +188,38 @@ export function pickRandomConsumableItem(items) {
         random -= item.weight;
       }
   } 
+
+
+  function pointersHealers(){
+        gameState.threshold.difficulty *= 2;
+        console.log("Difficulty increased!", gameState.threshold.difficulty);
+
+        gameState.points ++;
+
+        gameState.currenthealth = Math.min(
+        gameState.currenthealth + gameState.hpAdded * gameState.multiplier.forHealth,
+        gameState.maxHealth);
+  }
+
+  function increaseLvlDiff(){
+
+    if(gameState.points > gameState.threshold.difficulty){
+    gameState.multiplier.forHealth = Math.min(gameState.multiplier.forHealth + 0.2, 20);
+
+    gameState.Odds = Math.min(gameState.Odds - 0.2, 0.4); // increase odds for red items
+    gameState.boss.damageToBoss = Math.max(gameState.boss.damageToBoss - 2, 3);
+    gameState.boss.bossPoints = Math.floor(gameState.boss.bossPoints * 1.5); // increase boss points by 50%
+
+    gameState.timeManager.delaySpawner = Math.max(gameState.timeManager.delaySpawner, 500); // ensure it doesn't go below 200ms
+    gameState.timeManager.disappear = Math.max(gameState.timeManager.disappear, 600); // ensure it doesn't go below 200ms
+
+
+
+
+
+    gameState.threshold.difficulty *= 2; // double the threshold for next level
+    console.log("Difficulty increased!", gameState.threshold.difficulty);
+    
+    }
+
+  }

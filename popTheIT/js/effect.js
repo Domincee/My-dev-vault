@@ -1,7 +1,7 @@
 import { effecItemtLogic } from "./effectItemLogic.js";
 
 export const Effects = {
-  spawnParticles(x, y, parent) {
+  spawnParticles(x, y, parent,color) {
     const numParticles = 24;
 
     for (let i = 0; i < numParticles; i++) {
@@ -11,6 +11,9 @@ export const Effects = {
       // start position
       particle.style.left = `${x}px`;
       particle.style.top = `${y}px`;
+
+      particle.style.background = color;
+    
 
       parent.appendChild(particle);
 

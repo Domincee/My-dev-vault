@@ -3,13 +3,13 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--particle-color);
+  background: var(--particle-color); /* fallback */
   opacity: 1;
-  aspect-ratio: 1/1;
-  transform: scale(1.1);
-  transition: all 0.3s ease-in-out;
+  transform: scale(0.5);
   pointer-events: none;
+  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
 }
+
 
 
 .points-text {

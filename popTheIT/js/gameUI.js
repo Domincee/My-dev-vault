@@ -130,6 +130,7 @@ start() {
   gameState.boss.bossActive = true;
   
   effecItemtLogic.dropingItemCondition.stopDropping();
+  console.log(gameState.dropStateManger.forHealth)
   gameState.item = 1; // only spawn 1 (the boss)
   generateGrid(gameState.item);
   gameState.boss.currentHp = gameState.boss.maxHealth;
@@ -170,19 +171,17 @@ start() {
 
     boss.id = "boss";
     boss.src = "assets/bossRoy.png"; // default image
-  setTimeout(() => {
+    setTimeout(() => {
     bossText.remove();
-
+    
     
     boss.addEventListener("click", () => {
-    BossPhase.takeDamage(5 * gameState.boss.healthBossMultply);
-    const bossDamageTaken = 5 * gameState.boss.healthBossMultply;
+        BossPhase.takeDamage(gameState.boss.damageToBoss);
 
-    Effects.showPoints(bossDamageTaken,"❤️","red");
+        Effects.showPoints(gameState.boss.damageToBoss,"❤️","red");
 
-    console.log("Boss clicked! Current HP: " + gameState.boss.currentHp);
-    boss.src = "assets/bossRoyhurt.png"; // change to hurt version
-    boss.classList.add("boss-hurt");
+        boss.src = "assets/bossRoyhurt.png"; // change to hurt version
+        boss.classList.add("boss-hurt");
 
     // reset back after 0.3s  
     setTimeout(() => {
@@ -199,9 +198,10 @@ start() {
   }, 50);
 
   // 🔹 Sync HP depletion to start after slide (3s)
+
   setTimeout(() => {
-    depleteHP.start(10, 500); 
-    console.log("Boss HP depletion started!");
+    depleteHP.start(10, 500); // start depleting HP every 0.5s
+/*     console.log("Boss HP depletion started!"); */
 
     if( gameState.boss.currentHp <= 0) {
       popUpNotif.gameOver(gameState.points,gameState.highestPoints);
@@ -223,6 +223,9 @@ start() {
         // Flash effect
         bossHealthBarFill.classList.add("damage-flash");
         setTimeout(() => bossHealthBarFill.classList.remove("damage-flash"), 300);
+        
+      
+ 
       }
 
    let defeated = false  
@@ -248,17 +251,19 @@ start() {
   },
 
   end() {
-  gameState.boss.bossActive = false;
+    gameState.boss.bossActive = false;
+    effecItemtLogic.dropingItemCondition.startDropping();
     gameState.currenthealth = 100;
     gameState.points += gameState.boss.bossPoints;
     gameState.item = 100;   
-    gameState.boss.pointsThresholdForBossSpawn += 3;
+    gameState.threshold.forBossSpawn = gameState.points * 2;
     generateGrid(gameState.item);// restore normal
 
     const boss = document.getElementById("boss");
     if (boss) boss.remove();
     console.log("Boss defeated! Back to normal phase.");
     depleteHP.stop();
+
     depleteHP.start(10, 1000); // restore normal depletion
     itemCreation.createItem(); // resume item creation
     UpdateUi.ofScore(gameState.points);
@@ -271,8 +276,6 @@ start() {
 const scoreBoard = document.getElementById("scoreboard");
 const comboText = document.getElementById("comboCount");
 const healthBar = document.getElementById("healthBar");
-const healthBarCon = document.querySelector(".health-bar-container");
-const HP = document.getElementById('healthBar');
 
 export const UpdateUi = {
   ofScore: (points) => {

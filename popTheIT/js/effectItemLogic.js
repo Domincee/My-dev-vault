@@ -30,55 +30,63 @@ export const effecItemtLogic = {
 
     dropingItemCondition: {
         forHealth: () => {
-    if (!gameState.dropEnabled) return; // stop if disabled ✅
+          if (!gameState.dropStateManger.forHealth) return; // stop if disabled or false ✅
+          if(gameState.boss.bossActive) 
 
-    const minHealthDrop = 50;
+            console.log("boss active spawing heart"); // stop if boss is active ✅
+          const minHealthDrop = 50;
 
-    if (gameState.currenthealth <= minHealthDrop) {
-      const now = Date.now();
+          if (gameState.currenthealth <= minHealthDrop) {
+            const now = Date.now();
 
-      gameState.consumableItems.forEach(item => {
-        if (item.name === "itemHealth") {
-          if (!item.lastHealthDropTime || now - item.lastHealthDropTime >= item.healthDropCooldown) {
-            randomItemCreation.spawnConsumableItem(item);
-            item.lastHealthDropTime = now;
+            gameState.consumableItems.forEach(item => {
+              if (item.name === "itemHealth") {
+                if (!item.lastHealthDropTime || now - item.lastHealthDropTime >= item.healthDropCooldown) {
+                  randomItemCreation.spawnConsumableItem(item);
+                  item.lastHealthDropTime = now;
 
-            console.log(`succesfuly get ${item.name}`);
+                  console.log(`succesfuly get ${item.name}`);
+                }
+              }
+            });
           }
+        },
+
+      forGun: () => {
+        if (!gameState.dropStateManger.forGun) return; // stop if disabled ✅
+
+        console.log(gameState.consumableItems[1].thresholdSpawnGun);
+        const itemGun = gameState.consumableItems.find(item => item.name === "itemGun");
+
+
+        if (gameState.points > gameState.threshold.forGunSpawn) {
+          const now = Date.now();
+
+          if (!itemGun.lastHealthDropTime || now - itemGun.lastHealthDropTime >= itemGun.healthDropCooldown) {
+
+            randomItemCreation.spawnConsumableItem(itemGun);
+            itemGun.lastHealthDropTime = now;
+            console.log(`succesfuly get ${itemGun.name}`);
+          }
+          
+          console.log("Respawning GUN");
+        
+          
+
+          console.log("New threshold:",  gameState.threshold.forGunSpawn);
         }
-      });
-    }
-  },
-
-  forGun: () => {
-    if (!gameState.dropEnabled) return; // stop if disabled ✅
-
-    console.log(gameState.consumableItems[1].thresholdSpawnGun);
-    const itemGun = gameState.consumableItems.find(item => item.name === "itemGun");
-    if (gameState.points > gameState.thresholdofPointsForGun) {
-      const now = Date.now();
-
-      if (!itemGun.lastHealthDropTime || now - itemGun.lastHealthDropTime >= itemGun.healthDropCooldown) {
-        randomItemCreation.spawnConsumableItem(itemGun);
-        itemGun.lastHealthDropTime = now;
-        console.log(`succesfuly get ${itemGun.name}`);
-      }
-
-      console.log("Respawning GUN");
-     
-
-
-      console.log("New threshold:", gameState.consumableItems[1].thresholdSpawnGun);
-    }
-  },
+      },
 
   stopDropping: () => {
-    gameState.dropEnabled = false;
+    gameState.dropStateManger.forHealth = false;
+    gameState.dropStateManger.forGun = false;
+
     console.log("Consumable drops stopped.");
   },
 
   startDropping: () => {
-    gameState.dropEnabled = true;
+    gameState.dropStateManger.forHealth = true;
+    gameState.dropStateManger.forGun = true;
     console.log("Consumable drops resumed.");
   }
 }

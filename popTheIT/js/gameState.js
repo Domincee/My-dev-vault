@@ -2,14 +2,26 @@
         item: 100,
         theme: "default",
         points: 0,
-        dropEnabled  : true,
+
+        dropStateManger: {
+            forHealth: true,
+            forGun: true,
+        },
 
         highestPoints:  parseInt(localStorage.getItem("highestScore")) || 0,
         currenthealth: 100,
         maxHealth:100,
         addPoints: 1,
         hpAdded: 10,
-        Odds: 0.7, //odds between blue and red = 0.7 blue gets high chance to be picked
+        Odds: 0.8, //odds between blue and red = 0.7 blue gets high chance to be picked
+
+
+        threshold:
+        {
+            difficulty: 20, //points to increase difficulty
+            forBossSpawn: 2,
+            forGunSpawn:2,
+        },
 
         comboState: {
               comboCount: 0,
@@ -20,8 +32,6 @@
 
         multiplier: {
               forHealth:1.5,
-              forPoints:1.5,
-              forDamage:2,
 
         },
 
@@ -30,30 +40,23 @@
             maxHealth:100,
             currentHp:100,
             healthBossMultply :1,
-            pointsThresholdForBossSpawn: 5,
             bossPoints:10,
-            damageToBoss: 2, //decrease for higher boss level
+            damageToBoss: 3, //decrease for higher boss level
 
         },
 
         timeManager:{
-            delaySpawner: 1000, //1second
-            disappear: 1500,
+            delaySpawner: 500, //seconds before the next spawn of items
+            disappear: 600,//seconds before the item disappears
         
              //1.5second
         },
        
         consumableItems: [
             { name: "itemHealth",  value: 100 ,lastHealthDropTime: 0, healthDropCooldown: 10000, },
-            { name: "itemGun",  value: 10,lastHealthDropTime: 0, healthDropCooldown: 15000, duration: 10000, thresholdSpawnGun:10,multipltyThresholdBy:2}, // 10 seconds
+            { name: "itemGun",  value: 10,lastHealthDropTime: 0, healthDropCooldown: 15000, duration: 10000}, // 10 seconds
         ],
 
-        itemOnSlot: [
-            {slot1:null},
-            {slot2:null},
-            {slot3:null},
-            {slot4:null},
-        ]
        };
 
 
